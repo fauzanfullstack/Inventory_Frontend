@@ -1,46 +1,86 @@
-// src/utils/sAuth.ts
+// src/utils/users.ts
 import api from "./api";
 
+export interface User {
+  id: number;
+  username: string;
+  full_name: string;
+  email: string;
+  role: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 // ===============================
-// REGISTER USER
+// GET ALL USERS
 // ===============================
-export const registerUser = async (payload: {
+export const getUsers = async (): Promise<User[]> => {
+  try {
+    const { data } = await api.get("/auth/users");
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || error.message);
+  }
+};
+
+// ===============================
+// GET USER BY ID
+// ===============================
+export const getUserById = async (id: number): Promise<User> => {
+  try {
+    const { data } = await api.get(`/auth/users/${id}`);
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || error.message);
+  }
+};
+
+// ===============================
+// CREATE USER
+// ===============================
+export const createUser = async (payload: {
   username: string;
   full_name: string;
   email: string;
   password: string;
-}) => {
+  role: string;
+}): Promise<User> => {
   try {
     const { data } = await api.post("/auth/register", payload);
-    return data; // data.user + message
+    return data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || error.message);
   }
 };
 
 // ===============================
-// LOGIN USER
+// UPDATE USER
 // ===============================
-export const loginUser = async (payload: { email: string; password: string }) => {
+export const updateUser = async (
+  id: number,
+  payload: {
+    username?: string;
+    full_name?: string;
+    email?: string;
+    password?: string;
+    role?: string;
+  }
+): Promise<User> => {
   try {
-    const { data } = await api.post("/auth/login", payload);
-
-    // Simpan token & user ke localStorage
-    if (data?.token && data?.user) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-    }
-
-    return data; // data.user + token + message
+    const { data } = await api.put(`/auth/users/${id}`, payload);
+    return data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || error.message);
   }
 };
 
 // ===============================
-// LOGOUT USER
+// DELETE USER
 // ===============================
-export const logoutUser = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+export const deleteUser = async (id: number): Promise<void> => {
+  try {
+    await api.delete(`/auth/users/${id}`);
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || error.message);
+  }
 };

@@ -35,7 +35,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   const cards = [
-    { key: "users", title: "Users", path: "/users", icon: FaUser },
+    { key: "users", title: "Users", path: "/tableusers", icon: FaUser },
     { key: "items", title: "Items", path: "/tableitem", icon: FaBox },
     { key: "pr", title: "Purchase Requests", path: "/tablepurchaserequests", icon: FaClipboardList },
     { key: "prItems", title: "PR Items", path: "/pritems", icon: FaListAlt },

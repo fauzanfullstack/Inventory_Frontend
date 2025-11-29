@@ -37,7 +37,7 @@ export default function Sidebar() {
     {
       title: "Master Data",
       items: [
-        { label: "Users", path: "/users", icon: FaUser },
+        { label: "Users", path: "/tableusers", icon: FaUser },
         { label: "Items", path: "/tableitem", icon: FaBox },
         { label: "Stock Balance", path: "/stock-balance", icon: FaWarehouse },
       ],

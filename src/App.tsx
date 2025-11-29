@@ -8,6 +8,7 @@ import ProtectedRoute from "./ProtectedRoute";
 
 import Sidebar from "./pages/components/Sidebar";
 import Dashboard from "./pages/Dashboard";
+import TableUsers from "./TableUsers";
 
 // ========================
 // Import halaman lainnya
@@ -77,6 +78,14 @@ function Layout() {
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tableusers"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <TableUsers />
               </ProtectedRoute>
             }
           />
