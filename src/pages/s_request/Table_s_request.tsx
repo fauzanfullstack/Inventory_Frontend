@@ -14,6 +14,7 @@ import {
   Input,
   Flex,
 } from "@chakra-ui/react";
+// Icons removed - using emoji instead
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Table from "../components/Table";
@@ -57,6 +58,7 @@ const TableSRequest = () => {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [modalImage, setModalImage] = useState<string | null>(null);
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const navigate = useNavigate();
 
   const fetchData = async () => {
@@ -85,6 +87,18 @@ const TableSRequest = () => {
     } catch {
       alert("Gagal menghapus sRequest!");
     }
+  };
+
+  const toggleRow = (id: number) => {
+    setExpandedRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
   };
 
   // Kolom yang WAJIB ditampilkan (sesuai form create)
@@ -247,34 +261,116 @@ const TableSRequest = () => {
     });
 
     // ============================
-    // ITEMS PREVIEW COLUMN
+    // ITEMS OVERVIEW COLUMN (COLLAPSIBLE)
     // ============================
     const itemsCol: ColumnDef<any> = {
       accessorKey: "items",
       header: "Items",
       cell: ({ row }) => {
         const items = row.original.items;
+        const rowId = row.original.id;
+        const isExpanded = expandedRows.has(rowId);
         
         if (!items || !Array.isArray(items) || items.length === 0) {
-          return <Text color="gray.400">—</Text>;
+          return <Text color="gray.400" fontSize="sm">Tidak ada item</Text>;
         }
 
-        // Show first 2 items
-        const preview = items.slice(0, 2).map((item: any) => 
-          `${item.name} (${item.qty})`
-        ).join(", ");
-
-        const hasMore = items.length > 2;
+        const totalQty = items.reduce((sum: number, item: any) => sum + (item.qty || 0), 0);
 
         return (
-          <Text fontSize="sm">
-            {preview}
-            {hasMore && (
-              <Badge ml={2} colorScheme="blue" fontSize="0.7rem">
-                +{items.length - 2} lagi
-              </Badge>
+          <Box>
+            {/* Overview Button */}
+            <Button
+              size="sm"
+              variant="outline"
+              colorScheme="blue"
+              onClick={() => toggleRow(rowId)}
+              width="100%"
+            >
+              <Flex gap={2} align="center" justify="space-between" width="100%">
+                <Flex gap={2}>
+                  <Badge colorScheme="purple">{items.length} Items</Badge>
+                  <Badge colorScheme="green">Total: {totalQty}</Badge>
+                </Flex>
+                <Text fontSize="lg">{isExpanded ? "▲" : "▼"}</Text>
+              </Flex>
+            </Button>
+
+            {/* Collapsible Detail */}
+            {isExpanded && (
+              <Box
+                mt={2}
+                bg="gray.50"
+                p={3}
+                borderRadius="md"
+                border="1px solid"
+                borderColor="gray.200"
+                style={{
+                  animation: "fadeIn 0.2s ease-in",
+                }}
+              >
+                <Box overflowX="auto">
+                  <Box as="table" width="100%" style={{ borderCollapse: "collapse" }}>
+                    <Box as="thead" bg="blue.100">
+                      <Box as="tr">
+                        <Box as="th" p={2} textAlign="center" fontSize="xs" fontWeight="700" borderBottom="2px solid" borderColor="blue.300" width="60px">
+                          No
+                        </Box>
+                        <Box as="th" p={2} textAlign="left" fontSize="xs" fontWeight="700" borderBottom="2px solid" borderColor="blue.300">
+                          Item Name
+                        </Box>
+                        <Box as="th" p={2} textAlign="center" fontSize="xs" fontWeight="700" borderBottom="2px solid" borderColor="blue.300" width="100px">
+                          Qty
+                        </Box>
+                      </Box>
+                    </Box>
+                    <Box as="tbody">
+                      {items.map((item: any, idx: number) => (
+                        <Box 
+                          as="tr" 
+                          key={idx}
+                          _hover={{ bg: "blue.50" }}
+                          style={{ transition: "background-color 0.2s" }}
+                        >
+                          <Box 
+                            as="td" 
+                            p={2} 
+                            textAlign="center" 
+                            fontSize="sm"
+                            borderBottom="1px solid" 
+                            borderColor="gray.200"
+                          >
+                            {idx + 1}
+                          </Box>
+                          <Box 
+                            as="td" 
+                            p={2} 
+                            fontSize="sm"
+                            borderBottom="1px solid" 
+                            borderColor="gray.200"
+                          >
+                            {item.name || "—"}
+                          </Box>
+                          <Box 
+                            as="td" 
+                            p={2} 
+                            textAlign="center" 
+                            fontSize="sm"
+                            fontWeight="600"
+                            color="blue.600"
+                            borderBottom="1px solid" 
+                            borderColor="gray.200"
+                          >
+                            {item.qty || 0}
+                          </Box>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
             )}
-          </Text>
+          </Box>
         );
       }
     };
@@ -319,7 +415,7 @@ const TableSRequest = () => {
     };
 
     return [...base, ...dyn, itemsCol, actionCol];
-  }, [filters, uniqueValuesMap, navigate]);
+  }, [filters, uniqueValuesMap, navigate, expandedRows]);
 
   const table = useReactTable({
     data: filteredData,
@@ -346,6 +442,22 @@ const TableSRequest = () => {
 
   return (
     <Box overflowX="auto">
+      {/* CSS Animation */}
+      <style>
+        {`
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+              transform: translateY(-10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
+
       {/* Search and Action Buttons */}
       <Flex mb={4} gap={3} wrap="wrap" align="center">
         <Box position="relative" flex="1" minW="250px" maxW="400px">

@@ -21,7 +21,9 @@ import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 const MotionButton = motion(Button);
 const BASE_IMG = "http://localhost:5000/";
 
+// Filter dropdown fields
 const filterableKeys = ["status", "document_location", "supplier", "unit_type"];
+
 const selectStyle: React.CSSProperties = {
   width: "100%",
   marginTop: 4,
@@ -30,6 +32,25 @@ const selectStyle: React.CSSProperties = {
   padding: "4px",
   borderRadius: "4px",
   border: "1px solid #ccc",
+};
+
+// ----------------------
+// WARNA BADGE
+// ----------------------
+const statusColor = (status: string) => {
+  const s = status?.toLowerCase();
+  if (s === "accepted") return { bg: "green.100", color: "green.700" };
+  if (s === "rejected") return { bg: "red.100", color: "red.700" };
+  return { bg: "gray.100", color: "gray.700" };
+};
+
+const conditionColor = (cond: string) => {
+  const c = cond?.toLowerCase();
+  // good -> hijau, damaged -> kuning, expired -> merah
+  if (c === "good") return { bg: "green.100", color: "green.700" };
+  if (c === "damaged") return { bg: "yellow.100", color: "yellow.700" };
+  if (c === "expired") return { bg: "red.100", color: "red.700" };
+  return { bg: "gray.100", color: "gray.700" };
 };
 
 const TableReceiving = () => {
@@ -109,6 +130,7 @@ const TableReceiving = () => {
     const sampleKeys = data[0] ? Object.keys(data[0]) : [];
 
     const dyn: ColumnDef<any>[] = sampleKeys.map((key) => {
+      // Foto
       if (key === "documentation") {
         return {
           accessorKey: key,
@@ -135,6 +157,61 @@ const TableReceiving = () => {
         };
       }
 
+      // STATUS — kasih warna
+      if (key.toLowerCase().includes("status") && key.toLowerCase() === "status") {
+        // keep exact 'status' handling as before
+        return {
+          accessorKey: key,
+          header: "STATUS",
+          cell: ({ getValue }) => {
+            const value = String(getValue() || "-");
+            const style = statusColor(value);
+            return (
+              <Text
+                px={3}
+                py={1}
+                borderRadius="md"
+                fontWeight="bold"
+                textTransform="capitalize"
+                bg={style.bg}
+                color={style.color}
+                display="inline-block"
+              >
+                {value}
+              </Text>
+            );
+          },
+        };
+      }
+
+      // CONDITION — deteksi semua kolom yang mengandung kata 'condition'
+      if (key.toLowerCase().includes("condition")) {
+        return {
+          accessorKey: key,
+          header: "CONDITION",
+          cell: ({ getValue }) => {
+            const raw = getValue();
+            const value = raw === undefined || raw === null ? "-" : String(raw);
+            const style = conditionColor(value);
+            return (
+              <Text
+                px={3}
+                py={1}
+                borderRadius="md"
+                fontWeight="bold"
+                textTransform="capitalize"
+                bg={style.bg}
+                color={style.color}
+                display="inline-block"
+              >
+                {value}
+              </Text>
+            );
+          },
+        };
+      }
+
+      // Field filterable biasa
       if (filterableKeys.includes(key)) {
         return {
           accessorKey: key,
@@ -161,7 +238,7 @@ const TableReceiving = () => {
         };
       }
 
-      // Semua field lain tampil normal tanpa filter
+      // Default field
       return {
         accessorKey: key,
         header: key.replace(/_/g, " ").toUpperCase(),
@@ -169,6 +246,7 @@ const TableReceiving = () => {
       };
     });
 
+    // Action Buttons
     const actionCol: ColumnDef<any> = {
       id: "aksi",
       header: "Aksi",
@@ -205,6 +283,7 @@ const TableReceiving = () => {
     getCoreRowModel: getCoreRowModel(),
   });
 
+  // Loading
   if (loading)
     return (
       <Box textAlign="center" py={20}>
@@ -215,6 +294,7 @@ const TableReceiving = () => {
       </Box>
     );
 
+  // Error
   if (errorMsg)
     return (
       <Box p={4}>
