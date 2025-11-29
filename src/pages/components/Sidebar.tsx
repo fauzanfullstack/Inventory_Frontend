@@ -25,13 +25,15 @@ export default function Sidebar() {
   const [isHovered, setIsHovered] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/login");
   };
 
-  const menuGroups = [
+  const adminMenuGroups = [
     {
       title: "Master Data",
       items: [
@@ -73,6 +75,17 @@ export default function Sidebar() {
       ],
     },
   ];
+
+  const userMenuGroups = [
+    {
+      title: "Purchase Request",
+      items: [
+        { label: "Purchase Requests", path: "/tablepurchaserequests", icon: FaClipboardList },
+      ],
+    },
+  ];
+
+  const menuGroups = user.role === "admin" ? adminMenuGroups : userMenuGroups;
 
   return (
     <MotionBox

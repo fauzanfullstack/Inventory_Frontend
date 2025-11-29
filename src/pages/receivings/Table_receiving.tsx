@@ -9,7 +9,7 @@ import {
   Spinner,
   Image,
   CloseButton,
-  Input, // <- pastikan diimport
+  Input,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -21,11 +21,23 @@ import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 const MotionButton = motion(Button);
 const BASE_IMG = "http://localhost:5000/";
 
+const filterableKeys = ["status", "document_location", "supplier", "unit_type"];
+const selectStyle: React.CSSProperties = {
+  width: "100%",
+  marginTop: 4,
+  color: "#1a202c",
+  backgroundColor: "#f7fafc",
+  padding: "4px",
+  borderRadius: "4px",
+  border: "1px solid #ccc",
+};
+
 const TableReceiving = () => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState<Record<string, string>>({});
   const [modalImage, setModalImage] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -58,25 +70,31 @@ const TableReceiving = () => {
     }
   };
 
-  const sampleKeys = useMemo(
-    () =>
-      data.length > 0
-        ? Object.keys(data[0]).filter(
-            (k) => !["id", "number", "item_name", "condition_status"].includes(k)
-          )
-        : [],
-    [data]
-  );
-
   const filteredData = useMemo(() => {
-    return data.filter((item) => {
-      if (!search) return true;
-      return Object.values(item)
-        .join(" ")
-        .toLowerCase()
-        .includes(search.toLowerCase());
+    return data
+      .filter((item) =>
+        Object.entries(filters).every(([key, value]) => {
+          if (!value) return true;
+          return String(item[key]).toLowerCase() === value.toLowerCase();
+        })
+      )
+      .filter((item) => {
+        if (!search) return true;
+        return Object.values(item)
+          .join(" ")
+          .toLowerCase()
+          .includes(search.toLowerCase());
+      });
+  }, [data, search, filters]);
+
+  const uniqueValuesMap = useMemo(() => {
+    const map: Record<string, string[]> = {};
+    filterableKeys.forEach((key) => {
+      const values = [...new Set(data.map((d) => d[key]))].filter(Boolean);
+      map[key] = values.slice(0, 50);
     });
-  }, [data, search]);
+    return map;
+  }, [data]);
 
   const columns: ColumnDef<any>[] = useMemo(() => {
     const base: ColumnDef<any>[] = [
@@ -88,6 +106,8 @@ const TableReceiving = () => {
       },
     ];
 
+    const sampleKeys = data[0] ? Object.keys(data[0]) : [];
+
     const dyn: ColumnDef<any>[] = sampleKeys.map((key) => {
       if (key === "documentation") {
         return {
@@ -96,9 +116,7 @@ const TableReceiving = () => {
           cell: ({ row }) => {
             const path = row.original.documentation;
             if (!path) return "—";
-
             const fullUrl = path.startsWith("http") ? path : `${BASE_IMG}${path}`;
-
             return (
               <Image
                 src={fullUrl}
@@ -117,23 +135,38 @@ const TableReceiving = () => {
         };
       }
 
-      if (key === "status") {
+      if (filterableKeys.includes(key)) {
         return {
           accessorKey: key,
-          header: "Status",
-          cell: ({ getValue }) => {
-            const val = String(getValue() || "-").toLowerCase();
-            const color = val === "accepted" ? "green.500" : val === "rejected" ? "red.500" : "gray.500";
-            return <Text fontWeight="bold" color={color}>{val}</Text>;
-          },
+          header: () => (
+            <Box fontWeight="bold">
+              {key.replace(/_/g, " ").toUpperCase()}
+              <select
+                style={selectStyle}
+                value={filters[key] || ""}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, [key]: e.target.value }))
+                }
+              >
+                <option value="">Semua</option>
+                {uniqueValuesMap[key]?.map((v: string) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+            </Box>
+          ),
+          cell: ({ getValue }) => <Text>{String(getValue() || "-")}</Text>,
         };
       }
 
+      // Semua field lain tampil normal tanpa filter
       return {
         accessorKey: key,
-        header: key.replace("_", " ").toUpperCase(),
+        header: key.replace(/_/g, " ").toUpperCase(),
         cell: ({ getValue }) => <Text>{String(getValue() || "-")}</Text>,
-      } as ColumnDef<any>;
+      };
     });
 
     const actionCol: ColumnDef<any> = {
@@ -164,7 +197,7 @@ const TableReceiving = () => {
     };
 
     return [...base, ...dyn, actionCol];
-  }, [sampleKeys, navigate]);
+  }, [data, filters, uniqueValuesMap, navigate]);
 
   const table = useReactTable({
     data: filteredData,
@@ -204,15 +237,18 @@ const TableReceiving = () => {
           size="sm"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setSearch("")}
+          onClick={() => {
+            setSearch("");
+            setFilters({});
+          }}
         >
-          Reset Search
+          Reset Search & Filter
         </MotionButton>
 
         <Input
           placeholder="Cari Receiving..."
           value={search}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           bg="white"
           color="black"
           borderColor="gray.300"
@@ -240,7 +276,13 @@ const TableReceiving = () => {
 
       <Table table={table} />
 
-      <Text mt={4} fontSize="sm" textAlign="right" fontWeight="bold" color="gray.700">
+      <Text
+        mt={4}
+        fontSize="sm"
+        textAlign="right"
+        fontWeight="bold"
+        color="gray.700"
+      >
         Total Data: {filteredData.length}
       </Text>
 

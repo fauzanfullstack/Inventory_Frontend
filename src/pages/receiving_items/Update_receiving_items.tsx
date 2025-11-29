@@ -16,12 +16,13 @@ const UpdateReceivingItem = () => {
   const { id } = useParams<{ id: string }>();
   const [form, setForm] = useState({
     receiving_id: "",
-    item_id: "",
+    item_name: "",
     part_no: "",
     qty: "",
     unit_type: "",
-    price: "",
-    subtotal: "",
+    receive_status: "received",
+    source_type: "manual",
+    notes: "",
   });
   const [loading, setLoading] = useState(true);
 
@@ -33,12 +34,13 @@ const UpdateReceivingItem = () => {
         const data = await getReceivingItemById(id!);
         setForm({
           receiving_id: data.receiving_id || "",
-          item_id: data.item_id || "",
+          item_name: data.item_name || "",
           part_no: data.part_no || "",
           qty: data.qty ? String(data.qty) : "",
           unit_type: data.unit_type || "",
-          price: data.price ? String(data.price) : "",
-          subtotal: data.subtotal ? String(data.subtotal) : "",
+          receive_status: data.receive_status || "received",
+          source_type: data.source_type || "manual",
+          notes: data.notes || "",
         });
         setLoading(false);
       } catch (err) {
@@ -58,10 +60,14 @@ const UpdateReceivingItem = () => {
   const handleSubmit = async () => {
     try {
       const payload = {
-        ...form,
-        qty: form.qty ? Number(form.qty) : null,
-        price: form.price ? Number(form.price) : null,
-        subtotal: form.subtotal ? Number(form.subtotal) : null,
+        receiving_id: form.receiving_id ? Number(form.receiving_id) : null,
+        item_name: form.item_name,
+        part_no: form.part_no || null,
+        qty: form.qty ? Number(form.qty) : 1,
+        unit_type: form.unit_type || null,
+        receive_status: form.receive_status || "received",
+        source_type: form.source_type || "manual",
+        notes: form.notes || null,
       };
 
       await updateReceivingItem(id!, payload);
@@ -113,7 +119,7 @@ const UpdateReceivingItem = () => {
 
         <VStack gap={4}>
           <Input
-            placeholder="Receiving ID"
+            placeholder="Receiving ID (kosongkan jika manual)"
             name="receiving_id"
             value={form.receiving_id}
             onChange={handleChange}
@@ -121,15 +127,15 @@ const UpdateReceivingItem = () => {
           />
 
           <Input
-            placeholder="Item ID (opsional)"
-            name="item_id"
-            value={form.item_id}
+            placeholder="Item Name"
+            name="item_name"
+            value={form.item_name}
             onChange={handleChange}
             bg="gray.100"
           />
 
           <Input
-            placeholder="Part No"
+            placeholder="Part No (opsional)"
             name="part_no"
             value={form.part_no}
             onChange={handleChange}
@@ -154,19 +160,9 @@ const UpdateReceivingItem = () => {
           />
 
           <Input
-            placeholder="Price"
-            name="price"
-            type="number"
-            value={form.price}
-            onChange={handleChange}
-            bg="gray.100"
-          />
-
-          <Input
-            placeholder="Subtotal"
-            name="subtotal"
-            type="number"
-            value={form.subtotal}
+            placeholder="Notes (opsional)"
+            name="notes"
+            value={form.notes}
             onChange={handleChange}
             bg="gray.100"
           />
@@ -219,4 +215,3 @@ const UpdateReceivingItem = () => {
 };
 
 export default UpdateReceivingItem;
-// src/pages/receiving_items/Update_receiving_items.tsx

@@ -19,20 +19,22 @@ const UpdateMarketList = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
+
   const [form, setForm] = useState({
-    no: "",
-    status: "open",
+    status: "pending",
     open_date: "",
+    close_date: "",
     cd: "",
     cost_center: "",
     type_cost: "",
     total: "",
     notes: "",
+    item_id: "",
   });
 
-  const [placeholders, setPlaceholders] = useState({ ...form });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
@@ -40,28 +42,19 @@ const UpdateMarketList = () => {
   const fetchData = async () => {
     try {
       if (!id) return;
+
       const ml = await getMarketListById(Number(id));
 
       setForm({
-        no: ml.no || "",
-        status: ml.status || "open",
+        status: ml.status || "pending",
         open_date: ml.open_date ? ml.open_date.split("T")[0] : "",
+        close_date: ml.close_date ? ml.close_date.split("T")[0] : "",
         cd: ml.cd || "",
         cost_center: ml.cost_center || "",
         type_cost: ml.type_cost || "",
         total: ml.total?.toString() || "",
         notes: ml.notes || "",
-      });
-
-      setPlaceholders({
-        no: ml.no || "",
-        status: ml.status || "open",
-        open_date: ml.open_date ? ml.open_date.split("T")[0] : "",
-        cd: ml.cd || "",
-        cost_center: ml.cost_center || "",
-        type_cost: ml.type_cost || "",
-        total: ml.total?.toString() || "",
-        notes: ml.notes || "",
+        item_id: ml.item_id?.toString() || "",
       });
     } catch (err) {
       console.error(err);
@@ -76,10 +69,10 @@ const UpdateMarketList = () => {
       const payload = {
         ...form,
         total: form.total ? parseFloat(form.total) : 0,
+        item_id: form.item_id ? parseInt(form.item_id) : null,
       };
 
       await updateMarketList(Number(id!), payload);
-
       alert("Market List berhasil diupdate!");
       navigate("/marketlist");
     } catch (err) {
@@ -130,102 +123,168 @@ const UpdateMarketList = () => {
         </Heading>
 
         <VStack gap={4}>
-          <Input
-            placeholder={placeholders.no || "No"}
-            _placeholder={{ color: "gray.500" }}
-            name="no"
-            value={form.no}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
 
-          <Input
-            placeholder={placeholders.status || "Status"}
-            _placeholder={{ color: "gray.500" }}
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
+          {/* STATUS */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Status
+            </Text>
+            <Box
+              width="100%"
+              bg="white"
+              borderRadius="md"
+              border="1px solid #ccc"
+              p={1}
+            >
+              <select
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                style={{ width: "100%", padding: "6px", fontSize: "14px" }}
+              >
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="converted_to_pr">Converted to PR</option>
+              </select>
+            </Box>
+          </Box>
 
-          <Input
-            placeholder={placeholders.open_date || "Open Date"}
-            type="date"
-            _placeholder={{ color: "gray.500" }}
-            name="open_date"
-            value={form.open_date}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
+          {/* OPEN DATE */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Open Date
+            </Text>
+            <Input
+              placeholder="Open Date"
+              type="date"
+              name="open_date"
+              value={form.open_date}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
 
-          <Input
-            placeholder={placeholders.cd || "CD"}
-            _placeholder={{ color: "gray.500" }}
-            name="cd"
-            value={form.cd}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
+          {/* CLOSE DATE */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Close Date
+            </Text>
+            <Input
+              placeholder="Close Date"
+              type="date"
+              name="close_date"
+              value={form.close_date}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
 
-          <Input
-            placeholder={placeholders.cost_center || "Cost Center"}
-            _placeholder={{ color: "gray.500" }}
-            name="cost_center"
-            value={form.cost_center}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
+          {/* CD */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              CD
+            </Text>
+            <Input
+              placeholder="CD"
+              name="cd"
+              value={form.cd}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
 
-          <Input
-            placeholder={placeholders.type_cost || "Type Cost"}
-            _placeholder={{ color: "gray.500" }}
-            name="type_cost"
-            value={form.type_cost}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
+          {/* COST CENTER */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Cost Center
+            </Text>
+            <Input
+              placeholder="Cost Center"
+              name="cost_center"
+              value={form.cost_center}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
 
-          <Input
-            placeholder={placeholders.total || "Total"}
-            type="number"
-            _placeholder={{ color: "gray.500" }}
-            name="total"
-            value={form.total}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
+          {/* TYPE COST */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Type Cost
+            </Text>
+            <Input
+              placeholder="Type Cost"
+              name="type_cost"
+              value={form.type_cost}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
 
-          <Textarea
-            placeholder={placeholders.notes || "Notes"}
-            _placeholder={{ color: "gray.500" }}
-            name="notes"
-            value={form.notes}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
+          {/* TOTAL */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Total
+            </Text>
+            <Input
+              placeholder="Total"
+              type="number"
+              name="total"
+              value={form.total}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
+
+          {/* ITEM ID */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Item ID
+            </Text>
+            <Input
+              placeholder="Item ID"
+              type="number"
+              name="item_id"
+              value={form.item_id}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
+
+          {/* NOTES */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Notes
+            </Text>
+            <Textarea
+              placeholder="Notes"
+              name="notes"
+              value={form.notes}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
 
           <Button colorScheme="blue" width="full" onClick={handleSubmit}>
             Update
           </Button>
 
-          <Button
-            width="full"
-            variant="outline"
-            onClick={() => navigate("/marketlist")}
-          >
+          <Button width="full" variant="outline" onClick={() => navigate("/marketlist")}>
             Kembali
           </Button>
         </VStack>
       </Flex>
 
+      {/* RGB BORDER */}
       <style>
         {`
           @keyframes rgbBorder {

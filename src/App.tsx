@@ -1,4 +1,5 @@
-// App.tsx
+// src/App.tsx
+
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Flex, Box } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -56,10 +57,9 @@ import UpdateSRItem from "./pages/sr_items/Update_sr_items";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
-
-
 const queryClient = new QueryClient();
 
+// Layout component
 function Layout() {
   const location = useLocation();
   const hideSidebar = location.pathname === "/login" || location.pathname === "/register";
@@ -75,66 +75,65 @@ function Layout() {
           <Route
             path="/"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <Dashboard />
               </ProtectedRoute>
             }
           />
 
-
-
           {/* ITEMS */}
-          <Route path="/tableitem" element={<ProtectedRoute><TableItems /></ProtectedRoute>} />
-          <Route path="/createitem" element={<ProtectedRoute><CreateItems /></ProtectedRoute>} />
-          <Route path="/updateitem/:id" element={<ProtectedRoute><UpdateItems /></ProtectedRoute>} />
+          <Route path="/tableitem" element={<ProtectedRoute allowedRoles={["admin"]}><TableItems /></ProtectedRoute>} />
+          <Route path="/createitem" element={<ProtectedRoute allowedRoles={["admin"]}><CreateItems /></ProtectedRoute>} />
+          <Route path="/updateitem/:id" element={<ProtectedRoute allowedRoles={["admin"]}><UpdateItems /></ProtectedRoute>} />
 
           {/* PURCHASE REQUEST */}
           <Route path="/tablepurchaserequests" element={<ProtectedRoute><TablePurchaseRequest /></ProtectedRoute>} />
           <Route path="/createpurchaserequests" element={<ProtectedRoute><CreatePurchaseRequest /></ProtectedRoute>} />
-          <Route path="/updatepurchaserequests/:id" element={<ProtectedRoute><UpdatePurchaseRequest /></ProtectedRoute>} />
+          <Route path="/updatepurchaserequests/:id" element={<ProtectedRoute allowedRoles={["admin"]}><UpdatePurchaseRequest /></ProtectedRoute>} />
           <Route path="/printpurchaserequests/:id" element={<ProtectedRoute><PRPrint /></ProtectedRoute>} />
 
           {/* MARKET LIST */}
-          <Route path="/tablemarketlist" element={<ProtectedRoute><TableMarketList /></ProtectedRoute>} />
-          <Route path="/createmarketlist" element={<ProtectedRoute><CreateMarketList /></ProtectedRoute>} />
-          <Route path="/updatemarketlist/:id" element={<ProtectedRoute><UpdateMarketList /></ProtectedRoute>} />
+          <Route path="/tablemarketlist" element={<ProtectedRoute allowedRoles={["admin"]}><TableMarketList /></ProtectedRoute>} />
+          <Route path="/createmarketlist" element={<ProtectedRoute allowedRoles={["admin"]}><CreateMarketList /></ProtectedRoute>} />
+          <Route path="/updatemarketlist/:id" element={<ProtectedRoute allowedRoles={["admin"]}><UpdateMarketList /></ProtectedRoute>} />
 
           {/* ISSUING ITEMS */}
-          <Route path="/tableissuingitem" element={<ProtectedRoute><TableIssuingItems /></ProtectedRoute>} />
-          <Route path="/createissuingitem" element={<ProtectedRoute><CreateIssuingItems /></ProtectedRoute>} />
-          <Route path="/updateissuingitem/:id" element={<ProtectedRoute><UpdateIssuingItems /></ProtectedRoute>} />
+          <Route path="/tableissuingitem" element={<ProtectedRoute allowedRoles={["admin"]}><TableIssuingItems /></ProtectedRoute>} />
+          <Route path="/createissuingitem" element={<ProtectedRoute allowedRoles={["admin"]}><CreateIssuingItems /></ProtectedRoute>} />
+          <Route path="/updateissuingitem/:id" element={<ProtectedRoute allowedRoles={["admin"]}><UpdateIssuingItems /></ProtectedRoute>} />
 
           {/* SERVICE REQUEST */}
-          <Route path="/tablesrequests" element={<ProtectedRoute><TableSRequest /></ProtectedRoute>} />
-          <Route path="/createsrequest" element={<ProtectedRoute><CreateSRequest /></ProtectedRoute>} />
-          <Route path="/updatesrequest/:id" element={<ProtectedRoute><UpdateSRequest /></ProtectedRoute>} />
-          <Route path="/printsrequest/:id" element={<ProtectedRoute><SRequestPrint /></ProtectedRoute>} />
+          <Route path="/tablesrequests" element={<ProtectedRoute allowedRoles={["admin"]}><TableSRequest /></ProtectedRoute>} />
+          <Route path="/createsrequest" element={<ProtectedRoute allowedRoles={["admin"]}><CreateSRequest /></ProtectedRoute>} />
+          <Route path="/updatesrequest/:id" element={<ProtectedRoute allowedRoles={["admin"]}><UpdateSRequest /></ProtectedRoute>} />
+          <Route path="/printsrequest/:id" element={<ProtectedRoute allowedRoles={["admin"]}><SRequestPrint /></ProtectedRoute>} />
 
           {/* RECEIVING */}
-          <Route path="/tablereceiving" element={<ProtectedRoute><TableReceiving /></ProtectedRoute>} />
-          <Route path="/createreceiving" element={<ProtectedRoute><CreateReceiving /></ProtectedRoute>} />
-          <Route path="/updatereceiving/:id" element={<ProtectedRoute><UpdateReceiving /></ProtectedRoute>} />
+          <Route path="/tablereceiving" element={<ProtectedRoute allowedRoles={["admin"]}><TableReceiving /></ProtectedRoute>} />
+          <Route path="/createreceiving" element={<ProtectedRoute allowedRoles={["admin"]}><CreateReceiving /></ProtectedRoute>} />
+          <Route path="/updatereceiving/:id" element={<ProtectedRoute allowedRoles={["admin"]}><UpdateReceiving /></ProtectedRoute>} />
 
           {/* ISSUINGS */}
-          <Route path="/tableissuings" element={<ProtectedRoute><TableIssuing /></ProtectedRoute>} />
-          <Route path="/createissuings" element={<ProtectedRoute><CreateIssuing /></ProtectedRoute>} />
-          <Route path="/updateissuings/:id" element={<ProtectedRoute><UpdateIssuing /></ProtectedRoute>} />
+          <Route path="/tableissuings" element={<ProtectedRoute allowedRoles={["admin"]}><TableIssuing /></ProtectedRoute>} />
+          <Route path="/createissuings" element={<ProtectedRoute allowedRoles={["admin"]}><CreateIssuing /></ProtectedRoute>} />
+          <Route path="/updateissuings/:id" element={<ProtectedRoute allowedRoles={["admin"]}><UpdateIssuing /></ProtectedRoute>} />
 
           {/* PR ITEMS */}
-          <Route path="/pritems" element={<ProtectedRoute><TablePrItem /></ProtectedRoute>} />
-          <Route path="/createpritems" element={<ProtectedRoute><CreatePrItem /></ProtectedRoute>} />
-          <Route path="/updatepritems/:id" element={<ProtectedRoute><UpdatePrItem /></ProtectedRoute>} />
+          <Route path="/pritems" element={<ProtectedRoute allowedRoles={["admin"]}><TablePrItem /></ProtectedRoute>} />
+          <Route path="/createpritems" element={<ProtectedRoute allowedRoles={["admin"]}><CreatePrItem /></ProtectedRoute>} />
+          <Route path="/updatepritems/:id" element={<ProtectedRoute allowedRoles={["admin"]}><UpdatePrItem /></ProtectedRoute>} />
 
           {/* RECEIVING ITEMS */}
-          <Route path="/tablereceivingitems" element={<ProtectedRoute><TableReceivingItems /></ProtectedRoute>} />
-          <Route path="/createreceivingitems" element={<ProtectedRoute><CreateReceivingItem /></ProtectedRoute>} />
-          <Route path="/updatereceivingitems/:id" element={<ProtectedRoute><UpdateReceivingItem /></ProtectedRoute>} />
+          <Route path="/tablereceivingitems" element={<ProtectedRoute allowedRoles={["admin"]}><TableReceivingItems /></ProtectedRoute>} />
+          <Route path="/createreceivingitems" element={<ProtectedRoute allowedRoles={["admin"]}><CreateReceivingItem /></ProtectedRoute>} />
+          <Route path="/updatereceivingitems/:id" element={<ProtectedRoute allowedRoles={["admin"]}><UpdateReceivingItem /></ProtectedRoute>} />
 
           {/* SR ITEMS */}
-          <Route path="/tablesritems" element={<ProtectedRoute><TableSritems /></ProtectedRoute>} />
-          <Route path="/createsritems" element={<ProtectedRoute><CreateSRItem /></ProtectedRoute>} />
-          <Route path="/updatesritems/:id" element={<ProtectedRoute><UpdateSRItem /></ProtectedRoute>} />
+          <Route path="/tablesritems" element={<ProtectedRoute allowedRoles={["admin"]}><TableSritems /></ProtectedRoute>} />
+          <Route path="/createsritems" element={<ProtectedRoute allowedRoles={["admin"]}><CreateSRItem /></ProtectedRoute>} />
+          <Route path="/updatesritems/:id" element={<ProtectedRoute allowedRoles={["admin"]}><UpdateSRItem /></ProtectedRoute>} />
 
+          {/* Catch all */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Box>

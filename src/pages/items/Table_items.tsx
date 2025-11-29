@@ -98,12 +98,7 @@ const TableItems = () => {
 
   const columns: ColumnDef<any>[] = useMemo(() => {
     const base: ColumnDef<any>[] = [
-      {
-        accessorFn: (_row: any, i: number) => i + 1,
-        id: "no",
-        header: "No",
-        cell: (info) => info.getValue(),
-      },
+      { accessorFn: (_row: any, i: number) => i + 1, id: "no", header: "No", cell: (info) => info.getValue() },
     ];
 
     const dyn: ColumnDef<any>[] = Object.keys(data[0] || {}).map((key) => {
@@ -123,25 +118,27 @@ const TableItems = () => {
               >
                 <option value="">Semua</option>
                 {uniqueValuesMap[key]?.map((v: string) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
+                  <option key={v} value={v}>{v}</option>
                 ))}
               </select>
             )}
           </Box>
         ),
-        cell: ({ getValue }) =>
-          key === "aksi_centang" ? (
-            <Text
-              color={getValue() === true || getValue() === "true" ? "green.500" : "red.500"}
-              fontWeight="bold"
-            >
-              {String(getValue())}
-            </Text>
-          ) : (
-            getValue()
-          ),
+        cell: ({ getValue }) => {
+          // tampilkan true/false untuk aksi_centang
+          if (key === "aksi_centang") {
+            return (
+              <Text
+                color={getValue() === true || getValue() === "true" ? "green.500" : "red.500"}
+                fontWeight="bold"
+              >
+                {String(getValue())}
+              </Text>
+            );
+          }
+          // tampilkan created_by / updated_by apa adanya
+          return getValue() ?? "-";
+        },
       } as ColumnDef<any>;
     });
 
@@ -194,12 +191,8 @@ const TableItems = () => {
   if (errorMsg)
     return (
       <Box p={4}>
-        <Text color="red.500" mb={2}>
-          Gagal mengambil data items!
-        </Text>
-        <Text fontSize="sm" mb={3}>
-          {errorMsg}
-        </Text>
+        <Text color="red.500" mb={2}>Gagal mengambil data items!</Text>
+        <Text fontSize="sm" mb={3}>{errorMsg}</Text>
         <Button onClick={fetchData}>Coba lagi</Button>
       </Box>
     );

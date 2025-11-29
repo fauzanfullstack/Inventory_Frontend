@@ -12,18 +12,18 @@ export const getSRequestById = async (id: number | string) => {
   return data;
 };
 
-// CREATE sRequest (support upload file)
+// CREATE sRequest (TANPA file upload - pakai JSON)
 export const createSRequest = async (payload: any) => {
   const { data } = await api.post("/s-requests", payload, {
-    headers: { "Content-Type": "multipart/form-data" },
+    headers: { "Content-Type": "application/json" }, // ← UBAH INI
   });
   return data;
 };
 
-// UPDATE sRequest (support upload file baru)
+// UPDATE sRequest (TANPA file upload - pakai JSON)
 export const updateSRequest = async (id: number | string, payload: any) => {
   const { data } = await api.put(`/s-requests/${id}`, payload, {
-    headers: { "Content-Type": "multipart/form-data" },
+    headers: { "Content-Type": "application/json" }, // ← UBAH INI
   });
   return data;
 };

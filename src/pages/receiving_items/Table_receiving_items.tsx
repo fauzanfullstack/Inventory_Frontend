@@ -1,15 +1,25 @@
 // src/pages/receiving/TableReceivingItems.tsx
 import { useState, useEffect, useMemo } from "react";
-import { Box, Button, Heading, HStack, Spacer, Text, Spinner } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Heading,
+  HStack,
+  Spacer,
+  Text,
+  Spinner,
+  Input,
+} from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Table from "../components/Table";
-import { getReceivingItems, deleteReceivingItem } from "../../utils/receivingItems"; // sesuaikan utils
+import { getReceivingItems, deleteReceivingItem } from "../../utils/receivingItems";
 import type { ColumnDef } from "@tanstack/react-table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 
 const MotionButton = motion(Button);
 
+const filterableKeys = ["unit_type", "receive_status", "source_type"];
 const selectStyle: React.CSSProperties = {
   width: "100%",
   marginTop: 4,
@@ -24,6 +34,7 @@ const TableReceivingItems = () => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<Record<string, string>>({});
   const navigate = useNavigate();
 
@@ -32,7 +43,7 @@ const TableReceivingItems = () => {
     setErrorMsg(null);
     try {
       const payload = await getReceivingItems();
-      if (!Array.isArray(payload)) throw new Error("Response bukan array. Cek API backend!");
+      if (!Array.isArray(payload)) throw new Error("Response bukan array!");
       setData(payload);
     } catch (err: any) {
       console.error(err);
@@ -51,31 +62,36 @@ const TableReceivingItems = () => {
     try {
       await deleteReceivingItem(id);
       fetchData();
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert("Gagal menghapus receiving item!");
     }
   };
 
-  const sampleKeys = useMemo(() => (data.length > 0 ? Object.keys(data[0]) : []), [data]);
-
   const filteredData = useMemo(() => {
-    return data.filter((item) =>
-      Object.entries(filters).every(([key, value]) => {
-        if (!value) return true;
-        return String(item[key]).toLowerCase().includes(value.toLowerCase());
-      })
-    );
-  }, [filters, data]);
+    return data
+      .filter((item) =>
+        Object.entries(filters).every(([key, value]) => {
+          if (!value) return true;
+          return String(item[key]).toLowerCase() === value.toLowerCase();
+        })
+      )
+      .filter((item) => {
+        if (!search) return true;
+        return Object.values(item)
+          .join(" ")
+          .toLowerCase()
+          .includes(search.toLowerCase());
+      });
+  }, [data, filters, search]);
 
   const uniqueValuesMap = useMemo(() => {
     const map: Record<string, string[]> = {};
-    sampleKeys.forEach((key) => {
+    filterableKeys.forEach((key) => {
       const values = [...new Set(data.map((d) => d[key]))].filter(Boolean);
       map[key] = values.slice(0, 50);
     });
     return map;
-  }, [data, sampleKeys]);
+  }, [data]);
 
   const columns: ColumnDef<any>[] = useMemo(() => {
     const base: ColumnDef<any>[] = [
@@ -87,24 +103,41 @@ const TableReceivingItems = () => {
       },
     ];
 
-    const dyn: ColumnDef<any>[] = sampleKeys.map((key) => ({
-      accessorKey: key,
-      header: () => (
-        <Box>
-          {key}
-          <select
-            style={selectStyle}
-            value={filters[key] || ""}
-            onChange={(e) => setFilters((prev) => ({ ...prev, [key]: e.target.value }))}
-          >
-            <option value="">Semua</option>
-            {uniqueValuesMap[key]?.map((v: string) => (
-              <option key={v} value={v}>{v}</option>
-            ))}
-          </select>
-        </Box>
-      ),
-    }));
+    const sampleKeys = data[0] ? Object.keys(data[0]) : [];
+
+    const dyn: ColumnDef<any>[] = sampleKeys.map((key) => {
+      if (filterableKeys.includes(key)) {
+        return {
+          accessorKey: key,
+          header: () => (
+            <Box fontWeight="bold">
+              {key.replace(/_/g, " ").toUpperCase()}
+              <select
+                style={selectStyle}
+                value={filters[key] || ""}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, [key]: e.target.value }))
+                }
+              >
+                <option value="">Semua</option>
+                {uniqueValuesMap[key]?.map((v: string) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+            </Box>
+          ),
+          cell: ({ getValue }) => <Text>{String(getValue() || "-")}</Text>,
+        };
+      }
+
+      return {
+        accessorKey: key,
+        header: key.replace(/_/g, " ").toUpperCase(),
+        cell: ({ getValue }) => <Text>{String(getValue() || "-")}</Text>,
+      };
+    });
 
     const actionCol: ColumnDef<any> = {
       id: "aksi",
@@ -113,14 +146,18 @@ const TableReceivingItems = () => {
         <HStack gap={2}>
           <Button
             size="sm"
-            colorScheme="blue"
+            bg="blue.600"
+            color="white"
+            _hover={{ bg: "blue.500" }}
             onClick={() => navigate(`/updatereceivingitems/${row.original.id}`)}
           >
             Edit
           </Button>
           <Button
             size="sm"
-            colorScheme="red"
+            bg="red.600"
+            color="white"
+            _hover={{ bg: "red.500" }}
             onClick={() => handleDelete(row.original.id)}
           >
             Hapus
@@ -130,7 +167,7 @@ const TableReceivingItems = () => {
     };
 
     return [...base, ...dyn, actionCol];
-  }, [sampleKeys, filters, uniqueValuesMap, navigate]);
+  }, [data, filters, uniqueValuesMap, navigate]);
 
   const table = useReactTable({
     data: filteredData,
@@ -142,50 +179,74 @@ const TableReceivingItems = () => {
     return (
       <Box textAlign="center" py={20}>
         <Spinner size="xl" />
-        <Text mt={4}>Sedang memuat data receiving items...</Text>
+        <Text mt={4} fontWeight="bold">
+          Sedang memuat data receiving items...
+        </Text>
       </Box>
     );
 
   if (errorMsg)
     return (
       <Box p={4}>
-        <Text color="red.500" mb={2}>Gagal mengambil data receiving items!</Text>
-        <Text fontSize="sm" mb={3}>{errorMsg}</Text>
+        <Text color="red.500" mb={2}>
+          Gagal mengambil data receiving items!
+        </Text>
+        <Text fontSize="sm" mb={3}>
+          {errorMsg}
+        </Text>
         <Button onClick={fetchData}>Coba lagi</Button>
       </Box>
     );
 
   return (
     <Box overflowX="auto">
-      <HStack mb={4}>
+      <HStack mb={4} gap={3}>
         <MotionButton
-          bg="red.500"
+          bg="blue.600"
           color="white"
           size="sm"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setFilters({})}
+          onClick={() => {
+            setSearch("");
+            setFilters({});
+          }}
         >
-          Reset Filter
+          Reset Search & Filter
         </MotionButton>
+
+        <Input
+          placeholder="Cari Receiving Item..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          bg="white"
+          color="black"
+          borderColor="gray.300"
+          borderRadius="md"
+          size="sm"
+          maxW="250px"
+        />
+
         <Spacer />
+
         <Button
-          bg="green.500"
+          bg="green.600"
           color="white"
           size="sm"
+          _hover={{ bg: "green.500" }}
           onClick={() => navigate("/createreceivingitems")}
         >
           Tambah Receiving Item
         </Button>
       </HStack>
 
-      <Heading fontSize="2xl" mb={2} borderBottom="2px solid" pb={2}>
+      <Heading fontSize="2xl" mb={2} color="gray.800" fontWeight="bold">
         Data Receiving Items
       </Heading>
 
       <Table table={table} />
 
-      <Text mt={4} fontSize="sm" textAlign="right">
+      <Text mt={4} fontSize="sm" textAlign="right" fontWeight="bold" color="gray.700">
         Total Data: {filteredData.length}
       </Text>
     </Box>

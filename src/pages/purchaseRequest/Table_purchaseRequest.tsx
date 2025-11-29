@@ -9,6 +9,7 @@ import {
   Text,
   Spinner,
   Input,
+ 
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -56,6 +57,9 @@ const TablePurchaseRequest = () => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
+  // Ambil data user dari localStorage
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
   const fetchData = async () => {
     setLoading(true);
     setErrorMsg(null);
@@ -63,7 +67,13 @@ const TablePurchaseRequest = () => {
       const payload = await getPurchaseRequests();
       if (!Array.isArray(payload))
         throw new Error("Response bukan array. Cek API backend!");
-      setData(payload);
+
+      // Filter data untuk user biasa → hanya PR miliknya
+      const filtered = user.role === "admin"
+        ? payload
+        : payload.filter((pr: any) => pr.request_by === user.full_name || pr.created_by === user.id);
+
+      setData(filtered);
     } catch (err: any) {
       console.error(err);
       setErrorMsg(
@@ -79,6 +89,10 @@ const TablePurchaseRequest = () => {
   }, []);
 
   const handleDelete = async (id: number) => {
+    if (user.role !== "admin") {
+      alert("Hanya admin yang bisa menghapus PR!");
+      return;
+    }
     if (!window.confirm("Yakin ingin menghapus PR ini?")) return;
     try {
       await deletePurchaseRequest(id);
@@ -159,10 +173,10 @@ const TablePurchaseRequest = () => {
                 statusColorMap[String(getValue()).toLowerCase()] || "gray.500"
               }
             >
-              {String(getValue())} {/* <-- cast ke string supaya TS tidak error */}
+              {String(getValue())}
             </Text>
           ) : (
-            <Text>{String(getValue())}</Text> // <-- semua value di-cast ke string
+            <Text>{String(getValue())}</Text>
           ),
       } as ColumnDef<any>;
     });
@@ -172,17 +186,32 @@ const TablePurchaseRequest = () => {
       header: "Aksi",
       cell: ({ row }) => (
         <HStack gap={2}>
-          <Button
-            size="sm"
-            bg="blue.600"
-            color="white"
-            _hover={{ bg: "blue.500" }}
-            onClick={() =>
-              navigate(`/updatepurchaserequests/${row.original.id}`)
-            }
-          >
-            Edit
-          </Button>
+          {user.role === "admin" && (
+            <>
+              <Button
+                size="sm"
+                bg="blue.600"
+                color="white"
+                _hover={{ bg: "blue.500" }}
+                onClick={() =>
+                  navigate(`/updatepurchaserequests/${row.original.id}`)
+                }
+              >
+                Edit
+              </Button>
+
+              <Button
+                size="sm"
+                bg="red.600"
+                color="white"
+                _hover={{ bg: "red.500" }}
+                onClick={() => handleDelete(Number(row.original.id))}
+              >
+                Hapus
+              </Button>
+            </>
+          )}
+
           <Button
             size="sm"
             bg="green.600"
@@ -194,21 +223,12 @@ const TablePurchaseRequest = () => {
           >
             Print
           </Button>
-          <Button
-            size="sm"
-            bg="red.600"
-            color="white"
-            _hover={{ bg: "red.500" }}
-            onClick={() => handleDelete(Number(row.original.id))}
-          >
-            Hapus
-          </Button>
         </HStack>
       ),
     };
 
     return [...base, ...dyn, actionCol];
-  }, [data, filters, uniqueValuesMap, navigate]);
+  }, [data, filters, uniqueValuesMap, navigate, user.role]);
 
   const table = useReactTable({
     data: filteredData,

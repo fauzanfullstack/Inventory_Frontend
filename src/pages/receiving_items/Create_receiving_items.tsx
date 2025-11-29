@@ -6,36 +6,68 @@ import {
   Heading,
   Input,
   VStack,
-  Flex,
 } from "@chakra-ui/react";
-import { createReceivingItem } from "../../utils/receivingItems"; // sesuaikan utils
+import { createReceivingItem, } from "../../utils/receivingItems";
+import { getReceivingById } from "../../utils/receivings";
+ // pastikan utils ada function getReceivingById
 import { useNavigate } from "react-router-dom";
 
 const CreateReceivingItem = () => {
   const [form, setForm] = useState({
     receiving_id: "",
-    item_id: "",
+    item_name: "",
     part_no: "",
     qty: "",
     unit_type: "",
-    price: "",
-    subtotal: "",
+    receive_status: "received",
+    source_type: "manual",
+    notes: "",
   });
 
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
+
+    // Jika user mengisi receiving_id, ambil data dari receivings
+    if (name === "receiving_id" && value) {
+      try {
+        const data = await getReceivingById(Number(value));
+        setForm(prev => ({
+          ...prev,
+          item_name: data.item_name || "",
+          qty: data.qty ? String(data.qty) : "",
+          unit_type: data.unit_type || "",
+          receive_status: "supplier",
+          source_type: "supplier",
+        }));
+      } catch (err) {
+        console.error(err);
+        // reset jika tidak ditemukan
+        setForm(prev => ({
+          ...prev,
+          item_name: "",
+          qty: "",
+          unit_type: "",
+          receive_status: "received",
+          source_type: "manual",
+        }));
+      }
+    }
   };
 
   const handleSubmit = async () => {
     try {
       const payload = {
-        ...form,
-        qty: form.qty ? Number(form.qty) : null,
-        price: form.price ? Number(form.price) : null,
-        subtotal: form.subtotal ? Number(form.subtotal) : null,
+        receiving_id: form.receiving_id ? Number(form.receiving_id) : null,
+        item_name: form.item_name,
+        part_no: form.part_no || null,
+        qty: form.qty ? Number(form.qty) : 1,
+        unit_type: form.unit_type || null,
+        receive_status: form.receive_status || "received",
+        source_type: form.source_type || "manual",
+        notes: form.notes || null,
       };
 
       await createReceivingItem(payload);
@@ -49,20 +81,17 @@ const CreateReceivingItem = () => {
 
   return (
     <Box flex="1" bg="gray.50" p={8} minH="100vh">
-      {/* Title */}
       <Box mb={8} textAlign="left">
         <Heading size="xl" color="gray.700" fontWeight="extrabold">
           Tambah Receiving Item
         </Heading>
       </Box>
 
-      {/* Card */}
-      <Flex
+      <Box
         maxW="lg"
         mx="auto"
         p={6}
         rounded="lg"
-        direction="column"
         position="relative"
         className="rgb-card"
         bg="white"
@@ -79,7 +108,7 @@ const CreateReceivingItem = () => {
 
         <VStack gap={4}>
           <Input
-            placeholder="Receiving ID"
+            placeholder="Receiving ID (kosongkan jika manual)"
             name="receiving_id"
             value={form.receiving_id}
             onChange={handleChange}
@@ -87,15 +116,15 @@ const CreateReceivingItem = () => {
           />
 
           <Input
-            placeholder="Item ID (opsional)"
-            name="item_id"
-            value={form.item_id}
+            placeholder="Item Name"
+            name="item_name"
+            value={form.item_name}
             onChange={handleChange}
             bg="gray.100"
           />
 
           <Input
-            placeholder="Part No"
+            placeholder="Part No (opsional)"
             name="part_no"
             value={form.part_no}
             onChange={handleChange}
@@ -120,19 +149,9 @@ const CreateReceivingItem = () => {
           />
 
           <Input
-            placeholder="Price"
-            name="price"
-            type="number"
-            value={form.price}
-            onChange={handleChange}
-            bg="gray.100"
-          />
-
-          <Input
-            placeholder="Subtotal"
-            name="subtotal"
-            type="number"
-            value={form.subtotal}
+            placeholder="Notes (opsional)"
+            name="notes"
+            value={form.notes}
             onChange={handleChange}
             bg="gray.100"
           />
@@ -149,9 +168,8 @@ const CreateReceivingItem = () => {
             Kembali
           </Button>
         </VStack>
-      </Flex>
+      </Box>
 
-      {/* RGB Border Style */}
       <style>
         {`
           @keyframes rgbBorder {

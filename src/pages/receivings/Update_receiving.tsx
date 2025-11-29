@@ -19,25 +19,27 @@ const UpdateReceiving = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
+  const [documentation, setDocumentation] = useState<File | null>(null);
+
   const [form, setForm] = useState({
     number: "",
     document: "",
-    status: "pending",
+    item_name: "",
+    unit_type: "",
+    qty: "",
+    status: "accepted",
     location: "",
     cost_center: "",
     supplier: "",
     idr: "",
     total: "",
     notes: "",
+    updated_by: "Fauzan", // field wajib untuk update
+    condition_status: "", // tambahkan field condition_status
   });
 
-  const [placeholders, setPlaceholders] = useState({ ...form });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+  const handleChange = (e: any) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const fetchData = async () => {
@@ -48,25 +50,18 @@ const UpdateReceiving = () => {
       setForm({
         number: rcv.number || "",
         document: rcv.document || "",
-        status: rcv.status || "pending",
+        item_name: rcv.item_name || "",
+        unit_type: rcv.unit_type || "",
+        qty: rcv.qty?.toString() || "",
+        status: rcv.status || "accepted",
         location: rcv.location || "",
         cost_center: rcv.cost_center || "",
         supplier: rcv.supplier || "",
         idr: rcv.idr?.toString() || "",
         total: rcv.total?.toString() || "",
         notes: rcv.notes || "",
-      });
-
-      setPlaceholders({
-        number: rcv.number || "",
-        document: rcv.document || "",
-        status: rcv.status || "pending",
-        location: rcv.location || "",
-        cost_center: rcv.cost_center || "",
-        supplier: rcv.supplier || "",
-        idr: rcv.idr?.toString() || "",
-        total: rcv.total?.toString() || "",
-        notes: rcv.notes || "",
+        updated_by: "Fauzan",
+        condition_status: rcv.condition_status || "", // set default dari data
       });
     } catch (err) {
       console.error(err);
@@ -78,13 +73,15 @@ const UpdateReceiving = () => {
 
   const handleSubmit = async () => {
     try {
-      const payload = {
-        ...form,
-        idr: form.idr ? parseFloat(form.idr) : 0,
-        total: form.total ? parseFloat(form.total) : 0,
-      };
+      if (!form.item_name || form.item_name.trim() === "") {
+        return alert("Field 'Item Name' wajib diisi!");
+      }
 
-      await updateReceiving(Number(id!), payload);
+      const fd = new FormData();
+      Object.entries(form).forEach(([key, value]) => fd.append(key, value));
+      if (documentation) fd.append("documentation", documentation);
+
+      await updateReceiving(Number(id), fd);
       alert("Receiving berhasil diupdate!");
       navigate("/receiving");
     } catch (err) {
@@ -124,143 +121,94 @@ const UpdateReceiving = () => {
         className="rgb-card"
         bg="white"
       >
-        <Heading
-          size="md"
-          color="gray.700"
-          fontWeight="bold"
-          textAlign="center"
-          mb={4}
-        >
+        <Heading size="md" color="gray.700" fontWeight="bold" textAlign="center" mb={4}>
           Form Update Receiving
         </Heading>
 
         <VStack gap={4}>
-          <Input
-            placeholder={placeholders.number || "Number"}
-            _placeholder={{ color: "gray.500" }}
-            name="number"
-            value={form.number}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
-          <Input
-            placeholder={placeholders.document || "Document"}
-            _placeholder={{ color: "gray.500" }}
-            name="document"
-            value={form.document}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
-          <Input
-            placeholder={placeholders.status || "Status"}
-            _placeholder={{ color: "gray.500" }}
+          <Input placeholder="Number" name="number" value={form.number} onChange={handleChange} bg="gray.100" color="black" />
+          <Input placeholder="Document" name="document" value={form.document} onChange={handleChange} bg="gray.100" color="black" />
+          <Input placeholder="Item Name" name="item_name" value={form.item_name} onChange={handleChange} bg="gray.100" color="black" />
+          <Input placeholder="Unit Type" name="unit_type" value={form.unit_type} onChange={handleChange} bg="gray.100" color="black" />
+          <Input placeholder="Qty" type="number" name="qty" value={form.qty} onChange={handleChange} bg="gray.100" color="black" />
+          <Input type="file" accept="image/*" onChange={e => { if (e.target.files && e.target.files[0]) setDocumentation(e.target.files[0]); }} bg="gray.100" />
+
+          <select
             name="status"
             value={form.status}
             onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
-          <Input
-            placeholder={placeholders.location || "Location"}
-            _placeholder={{ color: "gray.500" }}
-            name="location"
-            value={form.location}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
-          <Input
-            placeholder={placeholders.cost_center || "Cost Center"}
-            _placeholder={{ color: "gray.500" }}
-            name="cost_center"
-            value={form.cost_center}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
-          <Input
-            placeholder={placeholders.supplier || "Supplier"}
-            _placeholder={{ color: "gray.500" }}
-            name="supplier"
-            value={form.supplier}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
-          <Input
-            placeholder={placeholders.idr || "IDR"}
-            _placeholder={{ color: "gray.500" }}
-            type="number"
-            name="idr"
-            value={form.idr}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
-          <Input
-            placeholder={placeholders.total || "Total"}
-            _placeholder={{ color: "gray.500" }}
-            type="number"
-            name="total"
-            value={form.total}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
-          <Textarea
-            placeholder={placeholders.notes || "Notes"}
-            _placeholder={{ color: "gray.500" }}
-            name="notes"
-            value={form.notes}
-            onChange={handleChange}
-            bg="gray.100"
-            color="gray.700"
-          />
-
-          <Button colorScheme="blue" width="full" onClick={handleSubmit}>
-            Update
-          </Button>
-
-          <Button
-            width="full"
-            variant="outline"
-            onClick={() => navigate("/receiving")}
+            style={{
+              width: "100%",
+              padding: "10px",
+              borderRadius: "8px",
+              border: "1px solid #E2E8F0",
+              background: "rgba(243, 244, 246, 0.9)",
+              color: "black",
+            }}
           >
-            Kembali
-          </Button>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+
+          {/* condition_status select */}
+          <select
+            name="condition_status"
+            value={form.condition_status}
+            onChange={handleChange}
+            style={{
+              width: "100%",
+              padding: "10px",
+              borderRadius: "8px",
+              border: "1px solid #E2E8F0",
+              background: "rgba(243, 244, 246, 0.9)",
+              color: "black",
+            }}
+          >
+            <option value="">Pilih Kondisi Barang</option>
+            <option value="good">Good</option>
+            <option value="damaged">Damaged</option>
+            <option value="expired">Expired</option>
+          </select>
+
+          <Input placeholder="Location" name="location" value={form.location} onChange={handleChange} bg="gray.100" color="black" />
+          <Input placeholder="Cost Center" name="cost_center" value={form.cost_center} onChange={handleChange} bg="gray.100" color="black" />
+          <Input placeholder="Supplier" name="supplier" value={form.supplier} onChange={handleChange} bg="gray.100" color="black" />
+          <Input placeholder="IDR" type="number" name="idr" value={form.idr} onChange={handleChange} bg="gray.100" color="black" />
+          <Input placeholder="Total" type="number" name="total" value={form.total} onChange={handleChange} bg="gray.100" color="black" />
+          <Textarea placeholder="Notes" name="notes" value={form.notes} onChange={handleChange} bg="gray.100" color="black" />
+          <Input placeholder="Updated By" name="updated_by" value={form.updated_by} onChange={handleChange} bg="gray.100" color="black" />
+
+          <Button colorScheme="blue" width="full" onClick={handleSubmit}>Update</Button>
+          <Button width="full" variant="outline" onClick={() => navigate("/receiving")}>Kembali</Button>
         </VStack>
       </Flex>
 
-      <style>
-        {`
-          @keyframes rgbBorder {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-          }
-          .rgb-card {
-            z-index: 0;
-          }
-          .rgb-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: 12px;
-            padding: 2px;
-            background: linear-gradient(270deg, red, orange, yellow, lime, cyan, blue, violet, red);
-            background-size: 400% 400%;
-            animation: rgbBorder 6s linear infinite;
-            -webkit-mask: 
-              linear-gradient(#fff 0 0) content-box, 
-              linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-                    mask-composite: exclude;
-            z-index: -1;
-          }
-        `}
-      </style>
+      <style>{`
+        @keyframes rgbBorder {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .rgb-card {
+          z-index: 0;
+        }
+        .rgb-card::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: 12px;
+          padding: 2px;
+          background: linear-gradient(270deg, red, orange, yellow, lime, cyan, blue, violet, red);
+          background-size: 400% 400%;
+          animation: rgbBorder 6s linear infinite;
+          -webkit-mask: 
+            linear-gradient(#fff 0 0) content-box, 
+            linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+                  mask-composite: exclude;
+          z-index: -1;
+        }
+      `}</style>
     </Box>
   );
 };

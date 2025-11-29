@@ -1,29 +1,44 @@
 // src/utils/purchaseRequest.ts
-import axios from "axios";
+import api from "./api";
 
-const BASE_URL = "http://localhost:5000/api/purchase-requests";
+// ===============================
+// Middleware axios untuk otomatis kirim token
+// ===============================
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token && config.headers) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
+// ===============================
+// Fungsi API Purchase Requests
+// ===============================
 export const getPurchaseRequests = async () => {
-  const res = await axios.get(BASE_URL);
+  const res = await api.get("/purchase-requests");
   return res.data;
 };
 
 export const getPurchaseRequestById = async (id: number) => {
-  const res = await axios.get(`${BASE_URL}/${id}`);
-  return res.data;
-};
-
-export const updatePurchaseRequest = async (id: number, payload: any) => {
-  const res = await axios.put(`${BASE_URL}/${id}`, payload);
+  const res = await api.get(`/purchase-requests/${id}`);
   return res.data;
 };
 
 export const createPurchaseRequest = async (payload: any) => {
-  const res = await axios.post(BASE_URL, payload);
+  const res = await api.post("/purchase-requests", payload);
+  return res.data;
+};
+
+export const updatePurchaseRequest = async (id: number, payload: any) => {
+  const res = await api.put(`/purchase-requests/${id}`, payload);
   return res.data;
 };
 
 export const deletePurchaseRequest = async (id: number) => {
-  const res = await axios.delete(`${BASE_URL}/${id}`);
+  const res = await api.delete(`/purchase-requests/${id}`);
   return res.data;
 };

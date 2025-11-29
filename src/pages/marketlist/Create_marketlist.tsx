@@ -7,25 +7,29 @@ import {
   VStack,
   Textarea,
   Flex,
+  Text,
 } from "@chakra-ui/react";
 import { createMarketList } from "../../utils/marketlist";
 import { useNavigate } from "react-router-dom";
 
 const CreateMarketList = () => {
   const [form, setForm] = useState({
-    status: "open",
+    status: "pending",
     open_date: "",
+    close_date: "",
     cd: "",
     cost_center: "",
     type_cost: "",
     total: "",
     notes: "",
-    item_id: "", // field item_id
+    item_id: "",
   });
 
   const navigate = useNavigate();
 
-  const handleChange = (e: any) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -34,7 +38,7 @@ const CreateMarketList = () => {
       const payload = {
         ...form,
         total: form.total ? parseFloat(form.total) : 0,
-        item_id: form.item_id ? parseInt(form.item_id) : null, // convert ke number
+        item_id: form.item_id ? parseInt(form.item_id) : null,
       };
 
       await createMarketList(payload);
@@ -48,14 +52,12 @@ const CreateMarketList = () => {
 
   return (
     <Box flex="1" bg="gray.50" p={8} minH="100vh">
-      {/* Title */}
       <Box mb={8} textAlign="left">
         <Heading size="xl" color="gray.700" fontWeight="extrabold">
           Tambah Market List
         </Heading>
       </Box>
 
-      {/* Card */}
       <Flex
         maxW="lg"
         mx="auto"
@@ -77,74 +79,156 @@ const CreateMarketList = () => {
         </Heading>
 
         <VStack gap={4}>
-          <Input
-            placeholder="Status"
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            bg="gray.100"
-            color="black"
-          />
-          <Input
-            placeholder="Open Date"
-            type="date"
-            name="open_date"
-            value={form.open_date}
-            onChange={handleChange}
-            bg="gray.100"
-            color="black"
-          />
-          <Input
-            placeholder="CD"
-            name="cd"
-            value={form.cd}
-            onChange={handleChange}
-            bg="gray.100"
-            color="black"
-          />
-          <Input
-            placeholder="Cost Center"
-            name="cost_center"
-            value={form.cost_center}
-            onChange={handleChange}
-            bg="gray.100"
-            color="black"
-          />
-          <Input
-            placeholder="Type Cost"
-            name="type_cost"
-            value={form.type_cost}
-            onChange={handleChange}
-            bg="gray.100"
-            color="black"
-          />
-          <Input
-            placeholder="Total"
-            type="number"
-            name="total"
-            value={form.total}
-            onChange={handleChange}
-            bg="gray.100"
-            color="black"
-          />
-          {/* Input Item ID */}
-          <Input
-            placeholder="Item ID"
-            type="number"
-            name="item_id"
-            value={form.item_id}
-            onChange={handleChange}
-            bg="gray.100"
-            color="black"
-          />
-          <Textarea
-            placeholder="Notes"
-            name="notes"
-            value={form.notes}
-            onChange={handleChange}
-            bg="gray.100"
-            color="black"
-          />
+
+          {/* STATUS */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Status
+            </Text>
+            <Box
+              width="100%"
+              bg="white"
+              borderRadius="md"
+              border="1px solid #ccc"
+              p={1}
+            >
+              <select
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                style={{ width: "100%", padding: "6px", fontSize: "14px" }}
+              >
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="converted_to_pr">Converted to PR</option>
+              </select>
+            </Box>
+          </Box>
+
+          {/* OPEN DATE */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Open Date
+            </Text>
+            <Input
+              placeholder="Open Date"
+              type="date"
+              name="open_date"
+              value={form.open_date}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
+
+          {/* CLOSE DATE */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Close Date
+            </Text>
+            <Input
+              placeholder="Close Date"
+              type="date"
+              name="close_date"
+              value={form.close_date}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
+
+          {/* CD */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              CD
+            </Text>
+            <Input
+              placeholder="CD"
+              name="cd"
+              value={form.cd}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
+
+          {/* COST CENTER */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Cost Center
+            </Text>
+            <Input
+              placeholder="Cost Center"
+              name="cost_center"
+              value={form.cost_center}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
+
+          {/* TYPE COST */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Type Cost
+            </Text>
+            <Input
+              placeholder="Type Cost"
+              name="type_cost"
+              value={form.type_cost}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
+
+          {/* TOTAL */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Total
+            </Text>
+            <Input
+              placeholder="Total"
+              type="number"
+              name="total"
+              value={form.total}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
+
+          {/* ITEM ID */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Item ID
+            </Text>
+            <Input
+              placeholder="Item ID"
+              type="number"
+              name="item_id"
+              value={form.item_id}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
+
+          {/* NOTES */}
+          <Box width="100%">
+            <Text fontSize="14px" fontWeight="600" mb={1}>
+              Notes
+            </Text>
+            <Textarea
+              placeholder="Notes"
+              name="notes"
+              value={form.notes}
+              onChange={handleChange}
+              bg="white"
+              color="black"
+            />
+          </Box>
 
           <Button colorScheme="green" width="full" onClick={handleSubmit}>
             Simpan
@@ -160,7 +244,7 @@ const CreateMarketList = () => {
         </VStack>
       </Flex>
 
-      {/* RGB Border Style */}
+      {/* RGB BORDER */}
       <style>
         {`
           @keyframes rgbBorder {

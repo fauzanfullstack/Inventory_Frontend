@@ -8,6 +8,7 @@ export default function Register() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("user"); // default role
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -15,12 +16,12 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      // FIX UTAMA DI SINI
       await api.post("/auth/register", {
         username,
         full_name: fullName,
         email,
         password,
+        role, // kirim role ke backend
       });
 
       alert("Registrasi berhasil. Silakan login.");
@@ -89,7 +90,7 @@ export default function Register() {
                   mb={2}
                   color="gray.800"
                 >
-                  Full name
+                  Full Name
                 </Text>
                 <Input
                   value={fullName}
@@ -140,7 +141,33 @@ export default function Register() {
                 />
               </Box>
 
-              {/* Tombol Register */}
+              <Box mb={4}>
+                <Text
+                  as="label"
+                  display="block"
+                  fontWeight="semibold"
+                  mb={2}
+                  color="gray.800"
+                >
+                  Role
+                </Text>
+                <select
+                  name="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    border: "1px solid #E2E8F0",
+                    background: "rgba(243, 244, 246, 0.9)",
+                  }}
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </Box>
+
               <chakra.button
                 type="submit"
                 width="100%"

@@ -25,8 +25,10 @@ const UpdateItems = () => {
     unit_type: "",
     unit: "",
     qty: "",
-    aksi_centang: "false", // string supaya dropdown bisa
+    aksi_centang: "false",
     notes: "",
+    created_by: "",
+    updated_by: "", // <- tambahkan updated_by
   });
 
   const handleChange = (e: any) => {
@@ -40,7 +42,6 @@ const UpdateItems = () => {
   const fetchData = async () => {
     try {
       const item = await getItemById(id!);
-
       setForm({
         part_no: item.part_no || "",
         name: item.name || "",
@@ -50,6 +51,8 @@ const UpdateItems = () => {
         qty: item.qty?.toString() || "",
         aksi_centang: item.aksi_centang ? "true" : "false",
         notes: item.notes || "",
+        created_by: item.created_by || "",
+        updated_by: item.updated_by || "", // <- ambil dari data
       });
     } catch (err) {
       console.error(err);
@@ -70,6 +73,7 @@ const UpdateItems = () => {
         qty: form.qty ? Number(form.qty) : 0,
         aksi_centang: form.aksi_centang === "true",
         notes: form.notes,
+        updated_by: form.updated_by || form.created_by || "Unknown", // <- pastikan ada value
       };
 
       await updateItem(Number(id), payload);
@@ -133,7 +137,6 @@ const UpdateItems = () => {
             color="black"
             fontSize={["sm", "md"]}
           />
-
           <Input
             placeholder="Nama Item"
             name="name"
@@ -143,7 +146,6 @@ const UpdateItems = () => {
             color="black"
             fontSize={["sm", "md"]}
           />
-
           <Input
             placeholder="Supplier"
             name="supplier"
@@ -153,7 +155,6 @@ const UpdateItems = () => {
             color="black"
             fontSize={["sm", "md"]}
           />
-
           <Input
             placeholder="Unit Type"
             name="unit_type"
@@ -163,7 +164,6 @@ const UpdateItems = () => {
             color="black"
             fontSize={["sm", "md"]}
           />
-
           <Input
             placeholder="Unit"
             name="unit"
@@ -173,7 +173,6 @@ const UpdateItems = () => {
             color="black"
             fontSize={["sm", "md"]}
           />
-
           <Input
             placeholder="Quantity"
             type="number"
@@ -184,8 +183,6 @@ const UpdateItems = () => {
             color="black"
             fontSize={["sm", "md"]}
           />
-
-          {/* Dropdown Aksi Centang */}
           <select
             name="aksi_centang"
             value={form.aksi_centang}
@@ -203,6 +200,26 @@ const UpdateItems = () => {
             <option value="true">TRUE</option>
             <option value="false">FALSE</option>
           </select>
+
+          <Input
+            placeholder="Created By"
+            name="created_by"
+            value={form.created_by}
+            onChange={handleChange}
+            bg="gray.100"
+            color="black"
+            fontSize={["sm", "md"]}
+          />
+
+          <Input
+            placeholder="Updated By"
+            name="updated_by"
+            value={form.updated_by}
+            onChange={handleChange}
+            bg="gray.100"
+            color="black"
+            fontSize={["sm", "md"]}
+          />
 
           <Textarea
             placeholder="Notes"
@@ -227,35 +244,6 @@ const UpdateItems = () => {
           </Button>
         </VStack>
       </Flex>
-
-      <style>
-        {`
-          @keyframes rgbBorder {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-          }
-          .rgb-card {
-            z-index: 0;
-          }
-          .rgb-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: 12px;
-            padding: 2px;
-            background: linear-gradient(270deg, red, orange, yellow, lime, cyan, blue, violet, red);
-            background-size: 400% 400%;
-            animation: rgbBorder 6s linear infinite;
-            -webkit-mask: 
-              linear-gradient(#fff 0 0) content-box, 
-              linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-                    mask-composite: exclude;
-            z-index: -1;
-          }
-        `}
-      </style>
     </Box>
   );
 };

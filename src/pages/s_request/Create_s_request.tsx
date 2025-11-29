@@ -15,7 +15,6 @@ import { useNavigate } from "react-router-dom";
 const CreateSRequest = () => {
   const [form, setForm] = useState({
     number: "",
-    documents: "",
     status: "open",
     open_date: "",
     expected_date: "",
@@ -25,50 +24,123 @@ const CreateSRequest = () => {
     notes: "",
   });
 
-  const [documentation, setDocumentation] = useState<File | null>(null);
+  // State untuk items
+  const [items, setItems] = useState([
+    { id: Date.now(), name: "", qty: 1 }
+  ]);
+
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setDocumentation(e.target.files[0]);
+  // Handle perubahan item
+  const handleItemChange = (id: number, field: string, value: string | number) => {
+    setItems(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  // Tambah item baru
+  const addItem = () => {
+    setItems(prev => [...prev, { id: Date.now(), name: "", qty: 1 }]);
+  };
+
+  // Hapus item
+  const removeItem = (id: number) => {
+    if (items.length > 1) {
+      setItems(prev => prev.filter(item => item.id !== id));
     }
   };
 
   const handleSubmit = async () => {
     try {
-      const fd = new FormData();
-      Object.entries(form).forEach(([key, val]) => fd.append(key, String(val)));
+      // Debug: tampilkan semua nilai form
+      console.log("Form values:", form);
+      console.log("Items:", items);
 
-      if (documentation) {
-        fd.append("documentation", documentation); // 👈 sesuai receiving
+      // Validasi field required
+      if (!form.number?.trim()) {
+        alert("Number harus diisi!");
+        return;
+      }
+      if (!form.open_date) {
+        alert("Open Date harus diisi!");
+        return;
+      }
+      if (!form.expected_date) {
+        alert("Expected Date harus diisi!");
+        return;
+      }
+      if (!form.cost_center?.trim()) {
+        alert("Cost Center harus diisi!");
+        return;
+      }
+      if (!form.location?.trim()) {
+        alert("Location harus diisi!");
+        return;
+      }
+      if (!form.request_by?.trim()) {
+        alert("Request By harus diisi!");
+        return;
       }
 
-      await createSRequest(fd);
+      // Filter item yang name-nya tidak kosong
+      const validItems = items.filter(item => item.name.trim() !== "");
+
+      if (validItems.length === 0) {
+        alert("Minimal harus ada 1 item yang diisi!");
+        return;
+      }
+
+      const payload = {
+        number: form.number.trim(),
+        status: form.status,
+        open_date: form.open_date,
+        expected_date: form.expected_date,
+        cost_center: form.cost_center.trim(),
+        location: form.location.trim(),
+        request_by: form.request_by.trim(),
+        notes: form.notes || "",
+        items: validItems.map(({ name, qty }) => ({ 
+          name: name.trim(), 
+          qty: parseInt(String(qty)) || 1 
+        })),
+        created_by: "Current User",
+        updated_by: "Current User",
+      };
+
+      console.log("Payload yang dikirim:", JSON.stringify(payload, null, 2));
+      
+      await createSRequest(payload);
       alert("Store Request berhasil dibuat!");
       navigate("/srequest");
-    } catch (err) {
-      console.error(err);
-      alert("Gagal membuat StoreRequest!");
+    } catch (err: any) {
+      console.error("Error detail:", err);
+      console.error("Error response data:", err.response?.data);
+      console.error("Error response status:", err.response?.status);
+      console.error("Error response headers:", err.response?.headers);
+      
+      const errorMessage = err.response?.data?.message || err.message || "Unknown error";
+      alert(`Gagal membuat Store Request!\n\nError: ${errorMessage}`);
     }
   };
 
   return (
     <Box flex="1" bg="gray.50" p={8} minH="100vh">
-      {/* Title */}
-      <Box mb={8} textAlign="left">
+      <Box mb={8}>
         <Heading size="xl" color="gray.700" fontWeight="extrabold">
           Tambah Store Request
         </Heading>
       </Box>
 
-      {/* Card */}
       <Flex
-        maxW="lg"
+        maxW="4xl"
         mx="auto"
         p={6}
         rounded="lg"
@@ -89,45 +161,69 @@ const CreateSRequest = () => {
 
         <VStack gap={4}>
           <Input
-            placeholder="Number (contoh: SR-001)"
+            placeholder="Number (SR-001)"
             name="number"
             value={form.number}
             onChange={handleChange}
-            bg="gray.100"
+            bg="white"
+            color="gray.800"
+            borderColor="gray.300"
+            _placeholder={{ color: "gray.400" }}
+            _hover={{ borderColor: "gray.400" }}
+            _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px #3182ce" }}
+            required
           />
 
-          <Input
-            placeholder="Documents (opsional)"
-            name="documents"
-            value={form.documents}
-            onChange={handleChange}
-            bg="gray.100"
-          />
+          {/* SELECT STATUS */}
+          <Box width="100%" bg="white" borderRadius="md" border="1px solid" borderColor="gray.300">
+            <select
+              name="status"
+              value={form.status}
+              onChange={handleChange}
+              style={{
+                width: "100%",
+                padding: "8px 12px",
+                fontSize: "16px",
+                borderRadius: "6px",
+                outline: "none",
+                border: "none",
+                backgroundColor: "white",
+                color: "#2D3748",
+              }}
+            >
+              <option value="open">Open</option>
+              <option value="waiting">Waiting</option>
+              <option value="approved">Approved</option>
+              <option value="purchase">Purchase</option>
+            </select>
+          </Box>
 
           <Input
-            placeholder="Status"
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            bg="gray.100"
-          />
-
-          <Input
-            placeholder="Open Date"
             type="date"
+            placeholder="Open Date"
             name="open_date"
             value={form.open_date}
             onChange={handleChange}
-            bg="gray.100"
+            bg="white"
+            color="gray.800"
+            borderColor="gray.300"
+            _hover={{ borderColor: "gray.400" }}
+            _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px #3182ce" }}
+            required
           />
 
           <Input
-            placeholder="Expected Date"
             type="date"
+            placeholder="Expected Date"
             name="expected_date"
             value={form.expected_date}
             onChange={handleChange}
-            bg="gray.100"
+            bg="white"
+            color="gray.800"
+            borderColor="gray.300"
+            _hover={{ borderColor: "gray.400" }}
+            _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px #3182ce" }}
+            required
           />
 
           <Input
@@ -135,7 +231,13 @@ const CreateSRequest = () => {
             name="cost_center"
             value={form.cost_center}
             onChange={handleChange}
-            bg="gray.100"
+            bg="white"
+            color="gray.800"
+            borderColor="gray.300"
+            _placeholder={{ color: "gray.400" }}
+            _hover={{ borderColor: "gray.400" }}
+            _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px #3182ce" }}
+            required
           />
 
           <Input
@@ -143,7 +245,13 @@ const CreateSRequest = () => {
             name="location"
             value={form.location}
             onChange={handleChange}
-            bg="gray.100"
+            bg="white"
+            color="gray.800"
+            borderColor="gray.300"
+            _placeholder={{ color: "gray.400" }}
+            _hover={{ borderColor: "gray.400" }}
+            _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px #3182ce" }}
+            required
           />
 
           <Input
@@ -151,41 +259,117 @@ const CreateSRequest = () => {
             name="request_by"
             value={form.request_by}
             onChange={handleChange}
-            bg="gray.100"
+            bg="white"
+            color="gray.800"
+            borderColor="gray.300"
+            _placeholder={{ color: "gray.400" }}
+            _hover={{ borderColor: "gray.400" }}
+            _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px #3182ce" }}
+            required
           />
+
+          {/* ITEMS SECTION */}
+          <Box width="100%" mt={4}>
+            <Flex justify="space-between" align="center" mb={2}>
+              <Heading size="sm" color="gray.700">Items</Heading>
+              <Button
+                size="sm"
+                colorScheme="green"
+                onClick={addItem}
+              >
+                + Tambah Item
+              </Button>
+            </Flex>
+
+            <Box overflowX="auto" border="1px solid #e2e8f0" borderRadius="md">
+              <Box as="table" width="100%" style={{ borderCollapse: "collapse" }}>
+                <Box as="thead" bg="gray.100">
+                  <Box as="tr">
+                    <Box as="th" p={2} textAlign="left" borderBottom="1px solid #e2e8f0">No</Box>
+                    <Box as="th" p={2} textAlign="left" borderBottom="1px solid #e2e8f0">Item Name</Box>
+                    <Box as="th" p={2} textAlign="left" borderBottom="1px solid #e2e8f0" width="120px">Qty</Box>
+                    <Box as="th" p={2} textAlign="center" borderBottom="1px solid #e2e8f0" width="80px">Aksi</Box>
+                  </Box>
+                </Box>
+                <Box as="tbody">
+                  {items.map((item, index) => (
+                    <Box as="tr" key={item.id}>
+                      <Box as="td" p={2} borderBottom="1px solid #e2e8f0">{index + 1}</Box>
+                      <Box as="td" p={2} borderBottom="1px solid #e2e8f0">
+                        <Input
+                          placeholder="Nama item"
+                          value={item.name}
+                          onChange={(e) =>
+                            handleItemChange(item.id, "name", e.target.value)
+                          }
+                          size="sm"
+                          bg="white"
+                          color="gray.800"
+                          borderColor="gray.300"
+                          _placeholder={{ color: "gray.400" }}
+                          _hover={{ borderColor: "gray.400" }}
+                          _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px #3182ce" }}
+                          required
+                        />
+                      </Box>
+                      <Box as="td" p={2} borderBottom="1px solid #e2e8f0">
+                        <Input
+                          type="number"
+                          value={item.qty}
+                          onChange={(e) =>
+                            handleItemChange(item.id, "qty", e.target.value)
+                          }
+                          size="sm"
+                          min={1}
+                          bg="white"
+                          color="gray.800"
+                          borderColor="gray.300"
+                          _hover={{ borderColor: "gray.400" }}
+                          _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px #3182ce" }}
+                        />
+                      </Box>
+                      <Box as="td" p={2} borderBottom="1px solid #e2e8f0" textAlign="center">
+                        {items.length > 1 && (
+                          <Button
+                            size="sm"
+                            colorScheme="red"
+                            onClick={() => removeItem(item.id)}
+                          >
+                            ✕
+                          </Button>
+                        )}
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            </Box>
+          </Box>
 
           <Textarea
             placeholder="Notes (opsional)"
             name="notes"
             value={form.notes}
             onChange={handleChange}
-            bg="gray.100"
-          />
-
-          {/* 📸 Upload Documentation */}
-          <Input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            bg="gray.100"
-            p={1}
+            bg="white"
+            color="gray.800"
+            borderColor="gray.300"
+            _placeholder={{ color: "gray.400" }}
+            _hover={{ borderColor: "gray.400" }}
+            _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px #3182ce" }}
           />
 
           <Button colorScheme="green" width="full" onClick={handleSubmit}>
             Simpan
           </Button>
 
-          <Button
-            width="full"
-            variant="outline"
-            onClick={() => navigate("/srequest")}
-          >
+          <Button width="full" variant="outline" onClick={() => navigate("/srequest")}>
             Kembali
           </Button>
         </VStack>
       </Flex>
 
-      {/* RGB Border Style */}
+      {/* RGB BORDER STYLE */}
       <style>
         {`
           @keyframes rgbBorder {
@@ -193,23 +377,36 @@ const CreateSRequest = () => {
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
           }
+
           .rgb-card {
             z-index: 0;
           }
+
           .rgb-card::before {
             content: "";
             position: absolute;
             inset: 0;
             border-radius: 12px;
             padding: 2px;
-            background: linear-gradient(270deg, red, orange, yellow, lime, cyan, blue, violet, red);
+            background: linear-gradient(
+              270deg,
+              red,
+              orange,
+              yellow,
+              lime,
+              cyan,
+              blue,
+              violet,
+              red
+            );
             background-size: 400% 400%;
             animation: rgbBorder 6s linear infinite;
-            -webkit-mask: 
-              linear-gradient(#fff 0 0) content-box, 
+
+            -webkit-mask:
+              linear-gradient(#fff 0 0) content-box,
               linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
-                    mask-composite: exclude;
+            mask-composite: exclude;
             z-index: -1;
           }
         `}

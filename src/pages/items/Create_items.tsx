@@ -38,16 +38,16 @@ const CreateItems = () => {
   const handleSubmit = async () => {
     try {
       const payload = {
-        part_no: form.part_no,
-        name: form.name,
+        part_no: form.part_no || null,
+        name: form.name || null,
         supplier: form.supplier || null,
-        unit_type: form.unit_type,
+        unit_type: form.unit_type || null,
         conversion: form.conversion || null,
         unit: form.unit || null,
-        qty: Number(form.qty),
-        aksi_centang: form.aksi_centang === "true", // konversi ke boolean
-        notes: form.notes,
-        created_by: form.created_by || null,
+        qty: Number(form.qty) || 0,
+        aksi_centang: form.aksi_centang === "true", // tetap boolean
+        notes: form.notes || null,
+        created_by: form.created_by || null,       // pastikan dikirim
       };
 
       await createItem(payload);

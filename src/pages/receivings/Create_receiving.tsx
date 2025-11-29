@@ -16,18 +16,21 @@ const CreateReceiving = () => {
   const [form, setForm] = useState({
     number: "",
     document: "",
-    item_name: "", // ditambahkan
-    status: "accepted", // default accepted
+    item_name: "",
+    unit_type: "",
+    qty: "",
+    status: "accepted",
     location: "",
     cost_center: "",
     supplier: "",
     idr: "",
     total: "",
     notes: "",
+    created_by: "",
+    condition_status: "", // tambahkan field baru ini
   });
 
   const [documentation, setDocumentation] = useState<File | null>(null);
-
   const navigate = useNavigate();
 
   const handleChange = (e: any) => {
@@ -91,33 +94,57 @@ const CreateReceiving = () => {
             value={form.number}
             onChange={handleChange}
             bg="gray.100"
+            color="black"
           />
+
           <Input
             placeholder="Document"
             name="document"
             value={form.document}
             onChange={handleChange}
             bg="gray.100"
+            color="black"
           />
 
-          {/* ITEM NAME */}
           <Input
             placeholder="Item Name"
             name="item_name"
             value={form.item_name}
             onChange={handleChange}
             bg="gray.100"
+            color="black"
           />
 
-          {/* FILE UPLOAD */}
+          <Input
+            placeholder="Unit Type (ex: pcs, box)"
+            name="unit_type"
+            value={form.unit_type}
+            onChange={handleChange}
+            bg="gray.100"
+            color="black"
+          />
+
+          <Input
+            placeholder="Qty"
+            type="number"
+            name="qty"
+            value={form.qty}
+            onChange={handleChange}
+            bg="gray.100"
+            color="black"
+          />
+
           <Input
             type="file"
             accept="image/*"
-            onChange={(e: any) => setDocumentation(e.target.files[0])}
+            onChange={(e: any) => {
+              if (e.target.files && e.target.files[0]) {
+                setDocumentation(e.target.files[0]);
+              }
+            }}
             bg="gray.100"
           />
 
-          {/* STATUS SELECT */}
           <select
             name="status"
             value={form.status}
@@ -128,10 +155,31 @@ const CreateReceiving = () => {
               borderRadius: "8px",
               border: "1px solid #E2E8F0",
               background: "rgba(243, 244, 246, 0.9)",
+              color: "black",
             }}
           >
             <option value="accepted">Accepted</option>
             <option value="rejected">Rejected</option>
+          </select>
+
+          {/* Tambahkan condition_status */}
+          <select
+            name="condition_status"
+            value={form.condition_status}
+            onChange={handleChange}
+            style={{
+              width: "100%",
+              padding: "10px",
+              borderRadius: "8px",
+              border: "1px solid #E2E8F0",
+              background: "rgba(243, 244, 246, 0.9)",
+              color: "black",
+            }}
+          >
+            <option value="">Pilih Kondisi Barang</option>
+            <option value="good">Good</option>
+            <option value="damaged">Damaged</option>
+            <option value="expired">Expired</option>
           </select>
 
           <Input
@@ -140,20 +188,25 @@ const CreateReceiving = () => {
             value={form.location}
             onChange={handleChange}
             bg="gray.100"
+            color="black"
           />
+
           <Input
             placeholder="Cost Center"
             name="cost_center"
             value={form.cost_center}
             onChange={handleChange}
             bg="gray.100"
+            color="black"
           />
+
           <Input
             placeholder="Supplier"
             name="supplier"
             value={form.supplier}
             onChange={handleChange}
             bg="gray.100"
+            color="black"
           />
 
           <Input
@@ -163,7 +216,9 @@ const CreateReceiving = () => {
             value={form.idr}
             onChange={handleChange}
             bg="gray.100"
+            color="black"
           />
+
           <Input
             placeholder="Total"
             type="number"
@@ -171,6 +226,7 @@ const CreateReceiving = () => {
             value={form.total}
             onChange={handleChange}
             bg="gray.100"
+            color="black"
           />
 
           <Textarea
@@ -179,6 +235,16 @@ const CreateReceiving = () => {
             value={form.notes}
             onChange={handleChange}
             bg="gray.100"
+            color="black"
+          />
+
+          <Input
+            placeholder="Created By"
+            name="created_by"
+            value={form.created_by}
+            onChange={handleChange}
+            bg="gray.100"
+            color="black"
           />
 
           <Button colorScheme="green" width="full" onClick={handleSubmit}>
@@ -195,7 +261,6 @@ const CreateReceiving = () => {
         </VStack>
       </Flex>
 
-      {/* RGB Border Style */}
       <style>
         {`
           @keyframes rgbBorder {

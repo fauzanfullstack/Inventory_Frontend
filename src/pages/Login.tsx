@@ -33,9 +33,7 @@ const Login = () => {
     try {
       setLoading(true);
 
-      // FIX di sini ⬇⬇⬇
       const resp = await api.post("/auth/login", { email, password });
-
       const { token, user } = resp.data;
 
       if (token) {
@@ -43,7 +41,15 @@ const Login = () => {
         localStorage.setItem("user", JSON.stringify(user));
 
         alert(`Login berhasil. Selamat datang, ${user.full_name}`);
-        navigate("/dashboard");
+
+        // 🔥 Redirect berdasarkan role
+        if (user.role === "user") {
+          navigate("/tablepurchaserequests");
+        } else if (user.role === "admin") {
+          navigate("/dashboard");
+        } else {
+          navigate("/dashboard"); // default fallback
+        }
       } else {
         setErrorMsg("Gagal mendapatkan token");
       }
