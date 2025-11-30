@@ -57,6 +57,7 @@ import UpdateSRItem from "./pages/sr_items/Update_sr_items";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import StockBalance from "./stockbalance";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +87,15 @@ function Layout() {
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <TableUsers />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/stockbalance"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <StockBalance />
               </ProtectedRoute>
             }
           />

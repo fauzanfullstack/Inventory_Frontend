@@ -15,6 +15,7 @@ import {
   FaBoxes,
   FaWarehouse,
   FaSignOutAlt,
+  FaTachometerAlt, // Icon untuk Dashboard
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -35,11 +36,17 @@ export default function Sidebar() {
 
   const adminMenuGroups = [
     {
+      title: "Main",
+      items: [
+        { label: "Dashboard", path: "/dashboard", icon: FaTachometerAlt },
+      ],
+    },
+    {
       title: "Master Data",
       items: [
         { label: "Users", path: "/tableusers", icon: FaUser },
         { label: "Items", path: "/tableitem", icon: FaBox },
-        { label: "Stock Balance", path: "/stock-balance", icon: FaWarehouse },
+        { label: "Stock Balance", path: "/stockbalance", icon: FaWarehouse },
       ],
     },
     {
@@ -77,6 +84,12 @@ export default function Sidebar() {
   ];
 
   const userMenuGroups = [
+    {
+      title: "Main",
+      items: [
+        { label: "Dashboard", path: "/dashboard", icon: FaTachometerAlt },
+      ],
+    },
     {
       title: "Purchase Request",
       items: [
