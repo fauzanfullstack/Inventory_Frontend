@@ -12,7 +12,7 @@ import { getSRequests } from "../utils/sRequest";
 import { getSRItems } from "../utils/srItems";
 import { getIssuings } from "../utils/issuings";
 import { getIssuingItems } from "../utils/issuingsItem";
-// Import untuk mendapatkan data users dari register
+
 import axios from "axios";
 
 import {
@@ -37,36 +37,35 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   const cards = [
-    { key: "users", title: "Users", path: "/tableusers", icon: FaUser, showCount: true },
-    { key: "items", title: "Items", path: "/tableitem", icon: FaBox, showCount: true },
-    { key: "pr", title: "Purchase Requests", path: "/tablepurchaserequests", icon: FaClipboardList, showCount: true },
-    { key: "prItems", title: "PR Items", path: "/pritems", icon: FaListAlt, showCount: true },
-    { key: "marketlists", title: "Marketlists", path: "/tablemarketlist", icon: FaShoppingCart, showCount: true },
-    { key: "rcv", title: "Receivings", path: "/tablereceiving", icon: FaTruckLoading, showCount: true },
-    { key: "rcvItems", title: "Receiving Items", path: "/tablereceivingitems", icon: FaTruck, showCount: true },
-    { key: "sreq", title: "Service Requests", path: "/tablesrequests", icon: FaClipboardCheck, showCount: true },
-    { key: "sreqItems", title: "SR Items", path: "/tablesritems", icon: FaClipboard, showCount: true },
-    { key: "issuing", title: "Issuings", path: "/tableissuings", icon: FaFileInvoice, showCount: true },
-    { key: "issuingItems", title: "Issuing Items", path: "/tableissuingitem", icon: FaBoxes, showCount: true },
-    { key: "stock", title: "Stock Balance", path: "/stockbalance", icon: FaWarehouse, showCount: false },
+    { key: "users", title: "Users", path: "/tableusers", icon: FaUser, showCount: false, color: "#6366F1" },
+    { key: "items", title: "Items", path: "/tableitem", icon: FaBox, showCount: true, color: "#8B5CF6" },
+    { key: "pr", title: "Purchase Requests", path: "/tablepurchaserequests", icon: FaClipboardList, showCount: true, color: "#3B82F6" },
+    { key: "prItems", title: "PR Items", path: "/pritems", icon: FaListAlt, showCount: true, color: "#0EA5E9" },
+    { key: "marketlists", title: "Marketlists", path: "/tablemarketlist", icon: FaShoppingCart, showCount: true, color: "#06B6D4" },
+    { key: "rcv", title: "Receivings", path: "/tablereceiving", icon: FaTruckLoading, showCount: true, color: "#10B981" },
+    { key: "rcvItems", title: "Receiving Items", path: "/tablereceivingitems", icon: FaTruck, showCount: true, color: "#14B8A6" },
+    { key: "sreq", title: "Service Requests", path: "/tablesrequests", icon: FaClipboardCheck, showCount: true, color: "#F59E0B" },
+    { key: "sreqItems", title: "SR Items", path: "/tablesritems", icon: FaClipboard, showCount: true, color: "#EF4444" },
+    { key: "issuing", title: "Issuings", path: "/tableissuings", icon: FaFileInvoice, showCount: true, color: "#EC4899" },
+    { key: "issuingItems", title: "Issuing Items", path: "/tableissuingitem", icon: FaBoxes, showCount: true, color: "#8B5CF6" },
+    { key: "stock", title: "Stock Balance", path: "/stockbalance", icon: FaWarehouse, showCount: false, color: "#6366F1" },
   ];
 
   const fetchCounts = async () => {
     try {
       const results = await Promise.all([
-        getItems(),            // 0
-        getPurchaseRequests(), // 1
-        getPrItems(),          // 2
-        getMarketLists(),      // 3
-        getReceivings(),       // 4
-        getReceivingItems(),   // 5
-        getSRequests(),        // 6
-        getSRItems(),          // 7
-        getIssuings(),         // 8
-        getIssuingItems(),     // 9
+        getItems(),
+        getPurchaseRequests(),
+        getPrItems(),
+        getMarketLists(),
+        getReceivings(),
+        getReceivingItems(),
+        getSRequests(),
+        getSRItems(),
+        getIssuings(),
+        getIssuingItems(),
       ]);
 
-      // Fetch users dari endpoint register
       let usersCount = 0;
       try {
         const usersResponse = await axios.get("http://localhost:3000/api/register");
@@ -102,19 +101,20 @@ export default function Dashboard() {
 
   return (
     <Box flex="1" bg="gray.50" p={8} minH="100vh">
-      {/* Header Card with RGB Border */}
+
+      {/* Header → tambahkan RGB border */}
       <Box 
         mb={8} 
-        className="rgb-card"
+        className="gradient-card rgb-border"
         bg="white"
         p={8}
         rounded="xl"
-        shadow="sm"
+        shadow="lg"
       >
-        <Heading size="2xl" color="gray.800" fontWeight="700" mb={3} letterSpacing="tight">
+        <Heading size="2xl" color="gray.800" fontWeight="700" mb={3}>
           Inventory Dashboard
         </Heading>
-        <Text fontSize="lg" color="gray.600" fontWeight="400">
+        <Text fontSize="lg" color="gray.600">
           Pilih modul untuk mulai bekerja
         </Text>
       </Box>
@@ -125,94 +125,128 @@ export default function Dashboard() {
         </Flex>
       ) : (
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} gap={6}>
-          {cards.map((card) => (
-            <Flex
-              key={card.key}
-              position="relative"
-              rounded="xl"
-              bg="white"
-              p={6}
-              direction="column"
-              align="center"
-              cursor="pointer"
-              transition="all 0.3s"
-              shadow="sm"
-              _hover={{ 
-                transform: "translateY(-4px)", 
-                shadow: "md" 
-              }}
-              onClick={() => navigate(card.path)}
-              className="rgb-card"
-            >
-              <Box 
-                bg="gray.50" 
-                p={4} 
-                rounded="full" 
-                mb={4}
-                transition="all 0.3s"
-                _groupHover={{ bg: "indigo.50" }}
-              >
-                <card.icon size={40} color="#4F46E5" />
-              </Box>
-              
-              <Heading size="md" color="gray.800" mb={3} textAlign="center" fontWeight="600">
-                {card.title}
-              </Heading>
+          
+          {cards.map((card) => {
+            const hex = card.color.replace("#", "");
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            const rgbaBg = `rgba(${r}, ${g}, ${b}, 0.15)`;
 
-              {card.showCount ? (
-                <>
-                  <Text fontSize="3xl" fontWeight="700" color="indigo.600" mb={1}>
-                    {counts[card.key]?.toLocaleString('id-ID') ?? 0}
-                  </Text>
-                  <Text fontSize="sm" color="gray.500" fontWeight="500">
-                    Total Data
-                  </Text>
-                </>
-              ) : (
-                <Box textAlign="center" mt={2}>
-                  <Text fontSize="sm" color="indigo.600" fontWeight="600" letterSpacing="wide">
-                    VIEW ANALYTICS
-                  </Text>
-                  <Text fontSize="xs" color="gray.500" mt={1}>
-                    Lihat laporan lengkap
-                  </Text>
+            return (
+              <Flex
+                key={card.key}
+                position="relative"
+                rounded="xl"
+                bg="white"
+                p={6}
+                direction="column"
+                align="center"
+                cursor="pointer"
+                transition="all 0.3s"
+                shadow="md"
+                borderWidth="1px"
+                borderColor="gray.100"
+                _hover={{ transform: "translateY(-6px)", shadow: "xl" }}
+                onClick={() => navigate(card.path)}
+                className="card-hover rgb-border"
+              >
+                <Box 
+                  bg={rgbaBg}
+                  p={4}
+                  rounded="full"
+                  mb={4}
+                  className="icon-container"
+                  transition="all 0.3s"
+                >
+                  <card.icon size={40} color={card.color} />
                 </Box>
-              )}
-            </Flex>
-          ))}
+
+                <Heading size="md" color="gray.800" mb={3} textAlign="center">
+                  {card.title}
+                </Heading>
+
+                {card.showCount ? (
+                  <>
+                    <Text fontSize="3xl" fontWeight="700" mb={1} style={{ color: card.color }}>
+                      {counts[card.key]?.toLocaleString("id-ID") ?? 0}
+                    </Text>
+                    <Text fontSize="sm" color="gray.500">Total Data</Text>
+                  </>
+                ) : null}
+
+              </Flex>
+            );
+          })}
+
         </SimpleGrid>
       )}
 
       <style>
         {`
-          @keyframes rgbBorder {
+          @keyframes subtleGradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
           }
-          .rgb-card {
+
+          /* Desain gradient-card tetap */
+          .gradient-card {
             position: relative;
-            background: white;
-            z-index: 0;
+            overflow: hidden;
           }
-          .rgb-card::before {
+
+          .gradient-card::before {
             content: "";
             position: absolute;
             inset: 0;
             border-radius: 12px;
             padding: 2px;
-            background: linear-gradient(270deg, red, orange, yellow, lime, cyan, blue, violet, red);
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #4facfe, #667eea);
+            background-size: 300% 300%;
+            animation: subtleGradient 8s ease infinite;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.6;
+            z-index: -1;
+          }
+
+          /* 🔥 Tambahan RGB Border seperti contoh kedua */
+          @keyframes rgbBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+
+          .rgb-border {
+            position: relative;
+          }
+
+          .rgb-border::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            padding: 2px;
+            background: linear-gradient(270deg, rgba(255,0,0,0.7), rgba(255,154,0,0.7), rgba(208,222,33,0.7), rgba(79,220,74,0.7), rgba(63,218,216,0.7), rgba(47,201,226,0.7), rgba(28,127,238,0.7), rgba(95,21,242,0.7), rgba(186,12,248,0.7));
             background-size: 400% 400%;
-            animation: rgbBorder 6s linear infinite;
-            -webkit-mask: 
-              linear-gradient(#fff 0 0) content-box, 
+            animation: rgbBorder 8s linear infinite;
+            -webkit-mask:
+              linear-gradient(#fff 0 0) content-box,
               linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
+            pointer-events: none;
             z-index: -1;
+          }
+
+          .card-hover:hover .icon-container {
+            transform: scale(1.12);
           }
         `}
       </style>
+
     </Box>
   );
 }
