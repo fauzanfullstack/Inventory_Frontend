@@ -129,7 +129,7 @@ Sistem Frontend Inventory berbasis **React + TypeScript + Chakra UI** yang menye
 
 ## 🚀 Proses Frontend Singkat
 
-### 📌 1. Instalasi
+### 📌 1.1 Instalasi Clone
 
 ```bash
 # Clone repository
@@ -141,7 +141,24 @@ npm install
 
 # Atau dengan pnpm (recommended)
 pnpm install
+
+lalu ubah 
+PG_HOST=localhost
+PG_PORT=5432
+PG_USER=postgres
+PG_PASSWORD=----
+PG_DATABASE=----
+
+PORT=5000
 ```
+
+1.2 Instalasi Pembuatan
+-Instal Node.js 
+-instal Vite
+-instal tanstack table
+-instal chakraUI 
+-instak react router dom   
+
 
 ### 📌 2. Konfigurasi Environment
 
@@ -156,9 +173,6 @@ VITE_UPLOAD_URL=http://localhost:5000/uploads
 
 ```bash
 npm run dev
-# atau
-pnpm run dev
-```
 
 Akses aplikasi di: **http://localhost:5173**
 
@@ -453,3 +467,4 @@ MIT License - feel free to use for learning purposes
 ---
 
 **⭐ Jangan lupa beri star jika project ini bermanfaat!**
+
