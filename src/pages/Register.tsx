@@ -24,11 +24,13 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       await api.post("/auth/register", {
         username,
@@ -57,65 +59,42 @@ export default function Register() {
       justifyContent="center"
       p={4}
     >
-      <Flex
-        maxW="500px"
-        w="full"
-        align="center"
-        justify="center"
-      >
+      <Flex maxW="450px" w="full" align="center" justify="center">
         <MotionBox
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          maxW="500px"
           w="full"
         >
           <Box
-            bg="rgba(255, 255, 255, 0.95)"
-            backdropFilter="blur(10px)"
+            bg="white"
             rounded="2xl"
-            boxShadow="0 20px 60px rgba(0,0,0,0.3)"
+            boxShadow="0 20px 60px rgba(0,0,0,0.15)"
             p={8}
-            border="1px solid rgba(255,255,255,0.2)"
+            border="1px solid"
+            borderColor="gray.200"
           >
-            {/* Logo & Title */}
+            {/* Logo */}
             <Box textAlign="center" mb={6}>
               <MotionBox
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+                transition={{ type: "spring", stiffness: 200, delay: 0.15 }}
               >
-                <Box
-                  position="relative"
-                  display="inline-block"
+                <Image
+                  src="/zuri.jpg"
+                  alt="Hotel Zuri Express"
+                  w="110px"
+                  h="110px"
+                  objectFit="contain"
+                  mx="auto"
                   mb={4}
-                  _before={{
-                    content: '""',
-                    position: "absolute",
-                    inset: "-10px",
-                    borderRadius: "50%",
-                    background:
-                      "linear-gradient(135deg, #f093fb, #f5576c, #4facfe)",
-                    opacity: 0.3,
-                    filter: "blur(20px)",
-                  }}
-                >
-                  <Image
-                    src="/zuri.jpg"
-                    alt="Hotel Zuri Express"
-                    w="100px"
-                    h="100px"
-                    objectFit="cover"
-                    borderRadius="full"
-                    border="4px solid white"
-                    boxShadow="0 8px 32px rgba(0,0,0,0.2)"
-                  />
-                </Box>
+                />
               </MotionBox>
 
               <Heading
                 size="lg"
-                bgGradient="linear(to-r, #f093fb, #f5576c)"
+                bgGradient="linear(to-r, #667eea, #764ba2)"
                 bgClip="text"
                 fontWeight="extrabold"
                 mb={2}
@@ -123,6 +102,7 @@ export default function Register() {
               >
                 Create Account
               </Heading>
+
               <Text color="gray.600" fontSize="sm" fontWeight="medium">
                 Join Hotel Zuri Express today
               </Text>
@@ -130,16 +110,16 @@ export default function Register() {
 
             {/* Form */}
             <form onSubmit={handleSubmit}>
-              <Stack gap={4}>
+              <Stack gap={5}>
+                {/* Username */}
                 <Box>
                   <Text
                     as="label"
-                    display="block"
                     fontWeight="bold"
                     mb={2}
                     color="gray.700"
                     fontSize="sm"
-                    letterSpacing="wide"
+                    display="block"
                   >
                     👤 Username
                   </Text>
@@ -151,28 +131,26 @@ export default function Register() {
                     bg="white"
                     border="2px solid"
                     borderColor="gray.200"
-                    _hover={{ borderColor: "pink.300" }}
+                    _hover={{ borderColor: "purple.300" }}
                     _focus={{
-                      borderColor: "pink.500",
-                      boxShadow: "0 0 0 3px rgba(240, 147, 251, 0.1)",
-                      outline: "none",
+                      borderColor: "purple.500",
+                      boxShadow: "0 0 0 3px rgba(102, 126, 234, 0.15)",
                     }}
-                    fontSize="md"
+                    rounded="xl"
                     fontWeight="medium"
                     color="gray.800"
-                    rounded="xl"
                   />
                 </Box>
 
+                {/* Full Name */}
                 <Box>
                   <Text
                     as="label"
-                    display="block"
                     fontWeight="bold"
                     mb={2}
                     color="gray.700"
                     fontSize="sm"
-                    letterSpacing="wide"
+                    display="block"
                   >
                     ✨ Full Name
                   </Text>
@@ -184,28 +162,26 @@ export default function Register() {
                     bg="white"
                     border="2px solid"
                     borderColor="gray.200"
-                    _hover={{ borderColor: "pink.300" }}
+                    _hover={{ borderColor: "purple.300" }}
                     _focus={{
-                      borderColor: "pink.500",
-                      boxShadow: "0 0 0 3px rgba(240, 147, 251, 0.1)",
-                      outline: "none",
+                      borderColor: "purple.500",
+                      boxShadow: "0 0 0 3px rgba(102, 126, 234, 0.15)",
                     }}
-                    fontSize="md"
+                    rounded="xl"
                     fontWeight="medium"
                     color="gray.800"
-                    rounded="xl"
                   />
                 </Box>
 
+                {/* Email */}
                 <Box>
                   <Text
                     as="label"
-                    display="block"
                     fontWeight="bold"
                     mb={2}
                     color="gray.700"
                     fontSize="sm"
-                    letterSpacing="wide"
+                    display="block"
                   >
                     📧 Email Address
                   </Text>
@@ -218,28 +194,26 @@ export default function Register() {
                     bg="white"
                     border="2px solid"
                     borderColor="gray.200"
-                    _hover={{ borderColor: "pink.300" }}
+                    _hover={{ borderColor: "purple.300" }}
                     _focus={{
-                      borderColor: "pink.500",
-                      boxShadow: "0 0 0 3px rgba(240, 147, 251, 0.1)",
-                      outline: "none",
+                      borderColor: "purple.500",
+                      boxShadow: "0 0 0 3px rgba(102, 126, 234, 0.15)",
                     }}
-                    fontSize="md"
+                    rounded="xl"
                     fontWeight="medium"
                     color="gray.800"
-                    rounded="xl"
                   />
                 </Box>
 
+                {/* Password */}
                 <Box>
                   <Text
                     as="label"
-                    display="block"
                     fontWeight="bold"
                     mb={2}
                     color="gray.700"
                     fontSize="sm"
-                    letterSpacing="wide"
+                    display="block"
                   >
                     🔒 Password
                   </Text>
@@ -247,36 +221,35 @@ export default function Register() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create a strong password"
+                    placeholder="Create a password"
                     h="50px"
                     bg="white"
                     border="2px solid"
                     borderColor="gray.200"
-                    _hover={{ borderColor: "pink.300" }}
+                    _hover={{ borderColor: "purple.300" }}
                     _focus={{
-                      borderColor: "pink.500",
-                      boxShadow: "0 0 0 3px rgba(240, 147, 251, 0.1)",
-                      outline: "none",
+                      borderColor: "purple.500",
+                      boxShadow: "0 0 0 3px rgba(102, 126, 234, 0.15)",
                     }}
-                    fontSize="md"
+                    rounded="xl"
                     fontWeight="medium"
                     color="gray.800"
-                    rounded="xl"
                   />
                 </Box>
 
+                {/* Role */}
                 <Box>
                   <Text
                     as="label"
-                    display="block"
                     fontWeight="bold"
                     mb={2}
                     color="gray.700"
                     fontSize="sm"
-                    letterSpacing="wide"
+                    display="block"
                   >
                     🛡️ Role
                   </Text>
+
                   <chakra.select
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
@@ -284,16 +257,14 @@ export default function Register() {
                     bg="white"
                     border="2px solid"
                     borderColor="gray.200"
-                    _hover={{ borderColor: "pink.300" }}
+                    _hover={{ borderColor: "purple.300" }}
                     _focus={{
-                      borderColor: "pink.500",
-                      boxShadow: "0 0 0 3px rgba(240, 147, 251, 0.1)",
-                      outline: "none",
+                      borderColor: "purple.500",
+                      boxShadow: "0 0 0 3px rgba(102, 126, 234, 0.15)",
                     }}
-                    fontSize="md"
+                    rounded="xl"
                     fontWeight="medium"
                     color="gray.800"
-                    rounded="xl"
                     cursor="pointer"
                   >
                     <option value="user">User</option>
@@ -301,42 +272,32 @@ export default function Register() {
                   </chakra.select>
                 </Box>
 
+                {/* Submit */}
                 <MotionButton
                   type="submit"
                   w="full"
                   h="55px"
-                  bgGradient="linear(to-r, #f093fb, #f5576c)"
+                  bgGradient="linear(to-r, #667eea, #764ba2)"
                   color="white"
                   rounded="xl"
                   fontWeight="bold"
                   fontSize="md"
-                  letterSpacing="wide"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                   disabled={loading}
-                  boxShadow="0 10px 30px rgba(245, 87, 108, 0.3)"
-                  _hover={{
-                    bgGradient: "linear(to-r, #f5576c, #f093fb)",
-                  }}
-                  mt={2}
+                  boxShadow="0 10px 30px rgba(102, 126, 234, 0.3)"
                 >
                   {loading ? "Creating Account..." : "✨ Register"}
                 </MotionButton>
 
-                <Flex
-                  justify="center"
-                  align="center"
-                  gap={2}
-                  fontSize="sm"
-                  color="gray.600"
-                  fontWeight="medium"
-                >
-                  <Text>Already have an account?</Text>
+                {/* Link to Login */}
+                <Flex justify="center" align="center" gap={2} fontSize="sm">
+                  <Text color="gray.600">Already have an account?</Text>
                   <Text
-                    color="pink.600"
+                    color="purple.600"
                     fontWeight="bold"
-                    _hover={{ color: "pink.700", textDecoration: "underline" }}
                     cursor="pointer"
+                    _hover={{ textDecoration: "underline" }}
                     onClick={() => navigate("/login")}
                   >
                     Login here

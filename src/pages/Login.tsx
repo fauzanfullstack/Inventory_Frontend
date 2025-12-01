@@ -70,12 +70,7 @@ const Login = () => {
       justifyContent="center"
       p={4}
     >
-      <Flex
-        maxW="450px"
-        w="full"
-        align="center"
-        justify="center"
-      >
+      <Flex maxW="450px" w="full" align="center" justify="center">
         <MotionBox
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -90,6 +85,7 @@ const Login = () => {
             p={8}
             border="1px solid"
             borderColor="gray.200"
+            position="relative"
           >
             {/* Logo & Title */}
             <Box textAlign="center" mb={6}>
@@ -98,32 +94,36 @@ const Login = () => {
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
               >
+                {/* ⭐ PERBAIKAN LOGO: Tidak terpotong, tanpa bingkai */}
                 <Image
                   src="/zuri.jpg"
                   alt="Hotel Zuri Express"
-                  w="100px"
-                  h="100px"
-                  objectFit="cover"
+                  w="120px"
+                  h="auto"
                   mx="auto"
                   mb={4}
-                  border="3px solid"
-                  borderColor="rgba(102, 126, 234, 0.3)"
-                  borderRadius="12px"
-                  boxShadow="0 8px 24px rgba(102, 126, 234, 0.2)"
+                  objectFit="contain" // gambar tidak terpotong
                 />
               </MotionBox>
 
+              {/* ⭐ PERBAIKAN FONT: lebih kontras, lebih kebaca */}
               <Heading
                 size="lg"
-                bgGradient="linear(to-r, #667eea, #764ba2)"
+                bgGradient="linear(to-r, #5a67d8, #7f5dc9)"
                 bgClip="text"
                 fontWeight="extrabold"
                 mb={2}
                 letterSpacing="tight"
+                fontSize="2xl"
               >
                 Hotel Zuri Express
               </Heading>
-              <Text color="gray.600" fontSize="sm" fontWeight="medium">
+
+              <Text
+                color="gray.700"
+                fontSize="md"
+                fontWeight="semibold"
+              >
                 Welcome back! Please login to continue
               </Text>
             </Box>
