@@ -1,9 +1,7 @@
 // src/utils/srItems.ts
 import api from "./api";
 
-// ===============================
 // GET ALL SR ITEMS
-// ===============================
 export const getSRItems = async () => {
   try {
     const { data } = await api.get("/sr-items");
@@ -14,9 +12,7 @@ export const getSRItems = async () => {
   }
 };
 
-// ===============================
 // GET SR ITEM BY ID
-// ===============================
 export const getSRItemById = async (id: number | string) => {
   try {
     const { data } = await api.get(`/sr-items/${id}`);
@@ -27,9 +23,7 @@ export const getSRItemById = async (id: number | string) => {
   }
 };
 
-// ===============================
 // CREATE SR ITEM
-// ===============================
 export const createSRItem = async (payload: any) => {
   try {
     const { data } = await api.post("/sr-items", payload);
@@ -40,9 +34,7 @@ export const createSRItem = async (payload: any) => {
   }
 };
 
-// ===============================
 // UPDATE SR ITEM
-// ===============================
 export const updateSRItem = async (id: number | string, payload: any) => {
   try {
     const { data } = await api.put(`/sr-items/${id}`, payload);
@@ -53,9 +45,7 @@ export const updateSRItem = async (id: number | string, payload: any) => {
   }
 };
 
-// ===============================
 // DELETE SR ITEM
-// ===============================
 export const deleteSRItem = async (id: number | string) => {
   try {
     const { data } = await api.delete(`/sr-items/${id}`);

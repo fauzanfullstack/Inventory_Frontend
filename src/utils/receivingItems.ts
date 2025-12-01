@@ -1,9 +1,7 @@
 // src/utils/receivingItems.ts
 import api from "./api";
 
-// ===============================
 // GET ALL RECEIVING ITEMS
-// ===============================
 export const getReceivingItems = async () => {
   try {
     const res = await api.get("/receiving-items");
@@ -14,9 +12,7 @@ export const getReceivingItems = async () => {
   }
 };
 
-// ===============================
 // GET RECEIVING ITEM BY ID
-// ===============================
 export const getReceivingItemById = async (id: number | string) => {
   try {
     const res = await api.get(`/receiving-items/${id}`);
@@ -27,9 +23,7 @@ export const getReceivingItemById = async (id: number | string) => {
   }
 };
 
-// ===============================
 // CREATE RECEIVING ITEM
-// ===============================
 export const createReceivingItem = async (payload: any) => {
   try {
     const res = await api.post("/receiving-items", payload);
@@ -40,9 +34,7 @@ export const createReceivingItem = async (payload: any) => {
   }
 };
 
-// ===============================
 // UPDATE RECEIVING ITEM
-// ===============================
 export const updateReceivingItem = async (
   id: number | string,
   payload: any
@@ -56,9 +48,7 @@ export const updateReceivingItem = async (
   }
 };
 
-// ===============================
 // DELETE RECEIVING ITEM
-// ===============================
 export const deleteReceivingItem = async (id: number | string) => {
   try {
     const res = await api.delete(`/receiving-items/${id}`);

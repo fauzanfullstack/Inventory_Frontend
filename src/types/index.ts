@@ -1,6 +1,5 @@
-// ===============================
+
 // USERS
-// ===============================
 export interface User {
   id: number;
   username: string;
@@ -10,9 +9,7 @@ export interface User {
   updated_at?: string;
 }
 
-// ===============================
 // ITEMS (MASTER)
-// ===============================
 export interface Item {
   id: number;
   part_no: string;
@@ -29,9 +26,7 @@ export interface Item {
   updated_at?: string;
 }
 
-// ===============================
 // PURCHASE REQUESTS (HEADER)
-// ===============================
 export interface PurchaseRequest {
   id: number;
   pr_number: string;
@@ -56,9 +51,7 @@ export interface PurchaseRequest {
   updated_at?: string;
 }
 
-// ===============================
 // MARKETLISTS
-// ===============================
 export interface MarketList {
   id: number;
   no?: string;
@@ -76,9 +69,7 @@ export interface MarketList {
   updated_at?: string;
 }
 
-// ===============================
 // RECEIVINGS (HEADER)
-// ===============================
 export interface Receiving {
   id: number;
   number: string;
@@ -97,9 +88,7 @@ export interface Receiving {
   updated_at?: string;
 }
 
-// ===============================
 // STORE REQUESTS (HEADER)
-// ===============================
 export interface SRequest {
   id: number;
   number: string;
@@ -118,9 +107,7 @@ export interface SRequest {
   updated_at?: string;
 }
 
-// ===============================
 // ISSUINGS (HEADER)
-// ===============================
 export interface Issuing {
   id: number;
   number: string;
@@ -139,9 +126,7 @@ export interface Issuing {
   updated_at?: string;
 }
 
-// ===============================
 // PR_ITEMS
-// ===============================
 export interface PRItem {
   id: number;
   purchase_request_id: number;
@@ -155,9 +140,7 @@ export interface PRItem {
   created_at?: string;
 }
 
-// ===============================
 // RECEIVING_ITEMS
-// ===============================
 export interface ReceivingItem {
   id: number;
   receiving_id: number;
@@ -169,9 +152,7 @@ export interface ReceivingItem {
   subtotal?: number;
 }
 
-// ===============================
 // SR_ITEMS
-// ===============================
 export interface SRItem {
   id: number;
   s_request_id: number;
@@ -182,9 +163,7 @@ export interface SRItem {
   notes?: string;
 }
 
-// ===============================
 // ISSUING_ITEMS
-// ===============================
 export interface IssuingItem {
   id: number;
   issuing_id: number;
@@ -196,10 +175,8 @@ export interface IssuingItem {
    issued_by: string;
 }
 
-// ===============================
 // VIEWS (OPTIONAL)
 // STOCK BALANCE VIEW
-// ===============================
 export interface StockBalanceView {
   item_id: number;
   part_no: string;

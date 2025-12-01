@@ -1,8 +1,6 @@
 import api from "./api";
 
-// ===============================
 // GET ALL ISSUING ITEMS
-// ===============================
 export const getIssuingItems = async () => {
   try {
     const res = await api.get("/issuing-items");
@@ -13,9 +11,7 @@ export const getIssuingItems = async () => {
   }
 };
 
-// ===============================
 // GET ISSUING ITEM BY ID
-// ===============================
 export const getIssuingItemById = async (id: number | string) => {
   try {
     const res = await api.get(`/issuing-items/${id}`);
@@ -26,9 +22,7 @@ export const getIssuingItemById = async (id: number | string) => {
   }
 };
 
-// ===============================
 // CREATE ISSUING ITEM
-// ===============================
 export const createIssuingItem = async (payload: any) => {
   try {
     const res = await api.post("/issuing-items", payload);
@@ -39,9 +33,7 @@ export const createIssuingItem = async (payload: any) => {
   }
 };
 
-// ===============================
 // UPDATE ISSUING ITEM
-// ===============================
 export const updateIssuingItem = async (
   id: number | string,
   payload: any
@@ -55,9 +47,7 @@ export const updateIssuingItem = async (
   }
 };
 
-// ===============================
 // DELETE ISSUING ITEM
-// ===============================
 export const deleteIssuingItem = async (id: number | string) => {
   try {
     const res = await api.delete(`/issuing-items/${id}`);

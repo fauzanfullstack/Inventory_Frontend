@@ -11,9 +11,7 @@ export interface User {
   updated_at?: string;
 }
 
-// ===============================
 // GET ALL USERS
-// ===============================
 export const getUsers = async (): Promise<User[]> => {
   try {
     const { data } = await api.get("/auth/users");
@@ -23,9 +21,7 @@ export const getUsers = async (): Promise<User[]> => {
   }
 };
 
-// ===============================
 // GET USER BY ID
-// ===============================
 export const getUserById = async (id: number): Promise<User> => {
   try {
     const { data } = await api.get(`/auth/users/${id}`);
@@ -35,9 +31,7 @@ export const getUserById = async (id: number): Promise<User> => {
   }
 };
 
-// ===============================
 // CREATE USER
-// ===============================
 export const createUser = async (payload: {
   username: string;
   full_name: string;
@@ -53,9 +47,7 @@ export const createUser = async (payload: {
   }
 };
 
-// ===============================
 // UPDATE USER
-// ===============================
 export const updateUser = async (
   id: number,
   payload: {
@@ -74,9 +66,7 @@ export const updateUser = async (
   }
 };
 
-// ===============================
 // DELETE USER
-// ===============================
 export const deleteUser = async (id: number): Promise<void> => {
   try {
     await api.delete(`/auth/users/${id}`);

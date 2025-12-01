@@ -1,9 +1,7 @@
 // src/utils/purchaseRequest.ts
 import api from "./api";
 
-// ===============================
 // Middleware axios untuk otomatis kirim token
-// ===============================
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -15,9 +13,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ===============================
 // Fungsi API Purchase Requests
-// ===============================
 export const getPurchaseRequests = async () => {
   const res = await api.get("/purchase-requests");
   return res.data;
