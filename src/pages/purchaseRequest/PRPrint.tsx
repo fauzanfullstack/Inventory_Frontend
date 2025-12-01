@@ -1,3 +1,4 @@
+// src/pages/purchase_request/PRPrint.tsx
 import { useEffect, useRef, useState } from "react";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
@@ -5,8 +6,6 @@ import { getPurchaseRequestById } from "../../utils/purchaseRequest";
 import type { PRItem, PurchaseRequest } from "../../types";
 import { useReactToPrint } from "react-to-print";
 
-// Hanya jika sudah install package:
-// npm install jspdf html2canvas
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
@@ -17,54 +16,56 @@ export default function PRPrint() {
   const [header, setHeader] = useState<PurchaseRequest | null>(null);
   const [items, setItems] = useState<PRItem[]>([]);
 
+  // FETCH DATA
   useEffect(() => {
     async function fetchData() {
       try {
         const res = await getPurchaseRequestById(Number(id));
-        console.log("PR API Response:", res);
-
         const data = res.data ?? res;
 
         setHeader(data);
 
-        // Buat array items dari header jika items tidak ada
-        const prItems: PRItem[] = data.items ?? [
-          {
-            id: data.id,
-            purchase_request_id: data.id,
-            item_id: data.item_id ?? null,
-            part_no: data.part_no,
-            description: data.description,
-            unit_type: data.unit_type,
-            qty: data.qty_f ?? 0,
-            cost: Number(data.cost ?? 0),
-            subtotal: Number(data.cost ?? 0) * (data.qty_f ?? 0),
-          },
-        ];
+        const mappedItems: PRItem[] = data.items
+          ? data.items
+          : [
+              {
+                id: data.id,
+                purchase_request_id: data.id,
+                item_id: data.item_id ?? null,
+                part_no: data.item_part_no ?? data.part_no ?? "-", // ✅ Ambil dari JOIN
+                description: data.item_name ?? data.description ?? "-", // ✅ Prioritaskan item_name dari JOIN
+                unit_type: data.item_unit_type ?? data.unit_type ?? "-", // ✅ Ambil dari JOIN
+                qty: data.qty_f ?? 0,
+                cost: Number(data.cost ?? 0),
+                subtotal: Number(data.cost ?? 0) * (data.qty_f ?? 0),
+              },
+            ];
 
-        setItems(prItems);
+        setItems(mappedItems);
       } catch (error) {
         console.error("Failed to fetch PR:", error);
         setHeader(null);
         setItems([]);
       }
     }
+
     fetchData();
   }, [id]);
 
-  // Print
+  // FIX useReactToPrint
   const handlePrint = useReactToPrint({
-    // @ts-ignore
-    content: () => printRef.current ?? null,
     documentTitle: `Purchase Request ${header?.pr_number ?? ""}`,
+    onAfterPrint: () => {
+      console.log("Printed successfully");
+    },
+    print: async () => printRef.current,
   });
 
-  // Download PDF
+  // PDF DOWNLOAD
   const handleDownloadPDF = async () => {
     if (!printRef.current) return;
 
-    const element = printRef.current;
-    const canvas = await html2canvas(element, { scale: 2 });
+    const canvas = await html2canvas(printRef.current, { scale: 2 });
     const imgData = canvas.toDataURL("image/png");
 
     const pdf = new jsPDF("p", "mm", "a4");
@@ -77,17 +78,16 @@ export default function PRPrint() {
 
   return (
     <Box p={5}>
-      {/* BUTTONS (hide on print) */}
       <Flex mb={5} className="no-print" gap={3}>
-        <Button colorScheme="blue" onClick={handlePrint}>
+        <Button colorScheme="blue" onClick={() => handlePrint()}>
           Print Purchase Request
         </Button>
+
         <Button colorScheme="green" onClick={handleDownloadPDF}>
           Download PDF
         </Button>
       </Flex>
 
-      {/* PRINT AREA */}
       <Box
         ref={printRef}
         p={10}
@@ -98,40 +98,28 @@ export default function PRPrint() {
         fontFamily="Arial, sans-serif"
         color="gray.800"
       >
-        {/* LOGO + TITLE */}
+        {/* HEADER */}
         <Flex justify="space-between" align="center" mb={8}>
           <Flex align="center" gap={4}>
-            <img
-              src="/zuri.jpg"
-              alt="Hotel Zuri Express"
-              style={{ width: "90px" }}
-            />
+            <img src="/zuri.jpg" alt="Hotel Zuri" style={{ width: "90px" }} />
             <Box>
-              <Text fontSize="2xl" fontWeight="bold">
-                PURCHASE REQUEST
-              </Text>
+              <Text fontSize="2xl" fontWeight="bold">PURCHASE REQUEST</Text>
               <Text fontSize="sm">Hotel Zuri Express Lippo Cikarang</Text>
             </Box>
           </Flex>
 
           <Box textAlign="right">
-            <Text fontSize="sm" fontWeight="bold">
-              PR Number:
-            </Text>
+            <Text fontWeight="bold" fontSize="sm">PR Number:</Text>
             <Text>{header?.pr_number ?? "-"}</Text>
 
-            <Text fontSize="sm" fontWeight="bold" mt={2}>
-              Due Date:
-            </Text>
+            <Text fontWeight="bold" fontSize="sm" mt={2}>Due Date:</Text>
             <Text>{header?.due_date ?? "-"}</Text>
           </Box>
         </Flex>
 
         {/* REQUEST INFO */}
         <Box mb={8}>
-          <Text fontWeight="bold" mb={2} fontSize="lg">
-            Request Information
-          </Text>
+          <Text fontWeight="bold" mb={2} fontSize="lg">Request Information</Text>
 
           <Box border="1px solid #ccc" borderRadius="6px">
             {[
@@ -154,34 +142,19 @@ export default function PRPrint() {
           </Box>
         </Box>
 
-        {/* ITEMS TABLE */}
+        {/* ITEMS LIST */}
         <Box>
-          <Text fontWeight="bold" mb={2} fontSize="lg">
-            Items Requested
-          </Text>
+          <Text fontWeight="bold" mb={2} fontSize="lg">Items Requested</Text>
 
-          {/* TABLE HEADER */}
-          <Flex
-            bg="#f4f4f4"
-            p={2}
-            fontWeight="semibold"
-            border="1px solid #ccc"
-          >
+          <Flex bg="#f4f4f4" p={2} fontWeight="semibold" border="1px solid #ccc">
             <Box flex="1">Part No</Box>
-            <Box flex="2">Description</Box>
-            <Box flex="1" textAlign="right">
-              Qty
-            </Box>
+            <Box flex="2">Item Name</Box>
+            <Box flex="1" textAlign="right">Qty</Box>
             <Box flex="1">Unit</Box>
-            <Box flex="1" textAlign="right">
-              Cost
-            </Box>
-            <Box flex="1" textAlign="right">
-              Subtotal
-            </Box>
+            <Box flex="1" textAlign="right">Cost</Box>
+            <Box flex="1" textAlign="right">Subtotal</Box>
           </Flex>
 
-          {/* ITEMS */}
           {items.length > 0 ? (
             items.map((item) => (
               <Flex
@@ -195,28 +168,22 @@ export default function PRPrint() {
                 <Box flex="2">{item.description ?? "-"}</Box>
                 <Box flex="1" textAlign="right">{item.qty ?? "-"}</Box>
                 <Box flex="1">{item.unit_type ?? "-"}</Box>
-                <Box flex="1" textAlign="right">
-                  {item.cost?.toLocaleString() ?? "-"}
-                </Box>
-                <Box flex="1" textAlign="right">
-                  {item.subtotal?.toLocaleString() ?? "-"}
-                </Box>
+                <Box flex="1" textAlign="right">{item.cost?.toLocaleString() ?? "-"}</Box>
+                <Box flex="1" textAlign="right">{item.subtotal?.toLocaleString() ?? "-"}</Box>
               </Flex>
             ))
           ) : (
-            <Text p={2} color="gray.500">
-              No items found.
-            </Text>
+            <Text p={3} color="gray.500">No items found.</Text>
           )}
         </Box>
 
         {/* TOTAL */}
         <Flex justify="flex-end" mt={5}>
           <Box textAlign="right">
-            <Text fontSize="lg" fontWeight="bold">
-              Total Cost:
+            <Text fontWeight="bold" fontSize="lg">Total Cost:</Text>
+            <Text fontSize="xl">
+              {header?.total_cost?.toLocaleString() ?? "0"}
             </Text>
-            <Text fontSize="xl">{header?.total_cost?.toLocaleString() ?? "0"}</Text>
           </Box>
         </Flex>
 
@@ -234,7 +201,7 @@ export default function PRPrint() {
         </Box>
       </Box>
 
-      {/* PRINT STYLES */}
+      {/* PRINT STYLE */}
       <style>
         {`
           @media print {

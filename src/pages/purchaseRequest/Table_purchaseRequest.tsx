@@ -9,7 +9,6 @@ import {
   Text,
   Spinner,
   Input,
- 
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -38,9 +37,12 @@ const filterableKeys = [
   "currency",
   "team",
   "request_by",
-  "departement",
+  "department",
   "status",
 ];
+
+// ✅ Kolom yang TIDAK ingin ditampilkan
+const hiddenColumns = ["created_by", "updated_by", "created_at", "updated_at"];
 
 const statusColorMap: Record<string, string> = {
   pending: "yellow.400",
@@ -140,7 +142,12 @@ const TablePurchaseRequest = () => {
       },
     ];
 
-    const dyn: ColumnDef<any>[] = Object.keys(data[0] || {}).map((key) => {
+    // ✅ Filter kolom yang tidak ingin ditampilkan
+    const visibleKeys = Object.keys(data[0] || {}).filter(
+      (key) => !hiddenColumns.includes(key)
+    );
+
+    const dyn: ColumnDef<any>[] = visibleKeys.map((key) => {
       const isFilterable = filterableKeys.includes(key);
       return {
         accessorKey: key,
